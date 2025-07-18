@@ -1,46 +1,52 @@
 <?php
-
+// src/Controller/AuthController.php
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-
-use PDO;
-use DrizzlePHP\DrizzlePHP;
-use App\Schemas\UsersSchema;
-use App\Model\LoginForm;
-use App\Service\MessageGenerator;
 use App\Service\DrizzleService;
+use Firebase\JWT\JWT;
+use App\Schemas\UsersSchema;
 
-final class LoginController extends AbstractController
+class LoginController extends AbstractController
 {
-	 
-	public function __construct(
-        private MessageGenerator $messageGenerator,
+    public function __construct(
         private DrizzleService $drizzleService
     ) {}
-    
-    
-    #[Route('/api/login', name: 'app_login')]
-    public function index(#[MapRequestPayload] LoginForm $form): JsonResponse
+
+    #[Route('/auth/login', name: 'auth_login', methods: ['POST'])]
+    public function login(Request $request): JsonResponse
     {
-		$message = $this->messageGenerator->getHappyMessage();
-		
-		$db = $this->drizzleService->getDb();
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? null;
+        $password = $data['password'] ?? null;
 
-        $users = $db->select(UsersSchema::class)
-            ->where('email', '=', $form->username)
-            ->where('password', '=', $form->password)
-            ->orderBy('name', 'ASC')
-            ->limit(10)
-            ->get();
+        if (!$email || !$password) {
+            return $this->json(['error' => 'Email and password required'], 400);
+        }
 
-        return $this->json([
-            'message' => $this->messageGenerator->getHappyMessage(),
-            'users' => $users,
-            'form' => $form,
-        ]);
+        $db = $this->drizzleService->getDb();
+
+        $user = $db->select(UsersSchema::class)
+            ->where('email', '=', $email)
+            ->where('password', '=', $password) // ❗ change to password_verify() if using hashes
+            ->first();
+
+        if (!$user) {
+            return $this->json(['error' => 'Invalid credentialsx'], 401);
+        }
+
+        $payload = [
+            'id' => $user['id'],
+            'email' => $user['email'],
+            'exp' => time() + 3600
+        ];
+
+        $jwtSecret = $_ENV['JWT_SECRET'] ?? 'your_jwt_secret';
+        $token = JWT::encode($payload, $jwtSecret, 'HS256');
+
+        return $this->json(['token' => $token]);
     }
 }

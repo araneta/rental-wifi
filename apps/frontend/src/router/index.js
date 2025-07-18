@@ -19,7 +19,8 @@ const routes = [
   { path: '/pelanggan', component: Pelanggan },
   { path: '/tagihan', component: Tagihan },
   { path: '/pembayaran', component: Pembayaran },
-  { path: '/rekap', component: Rekap }
+  { path: '/rekap', component: Rekap },
+  { path: '/dashboard', component: Dashboard }
 ];
 
 const router = createRouter({

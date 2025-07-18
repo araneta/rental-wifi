@@ -5,7 +5,7 @@
       <form @submit.prevent="login">
         <div class="mb-3">
           <label>Username</label>
-          <input v-model="form.username" class="form-control" required />
+          <input v-model="form.email" class="form-control" required />
         </div>
         <div class="mb-3">
           <label>Password</label>
@@ -19,21 +19,22 @@
 </template>
 
 <script>
-import { apiFetch } from '../api';
+import { authFetch } from '../api';
 
 export default {
   data() {
-    return { form: { username: '', password: '' }, error: '' };
+    return { form: { email: 'agilsuhanda515@gmail.com', password: '515' }, error: '' };
   },
   methods: {
     async login() {
       try {
-        const data = await apiFetch('/login', {
+        const data = await authFetch('/login', {
           method: 'POST',
           body: JSON.stringify(this.form)
         });
         localStorage.setItem('token', data.token);
-        this.$router.push('/');
+        console.log('login ok');
+        this.$router.push('/dashboard');
       } catch (e) {
         this.error = 'Login failed';
       }

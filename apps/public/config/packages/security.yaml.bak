@@ -1,0 +1,40 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: auto
+
+    providers:
+        users_in_memory:
+            memory:
+                users:
+                    test@example.com:
+                        password: '$2y$13$z4xV5hdz2N/CMKfPUNFjqOv1l.yWnP6umrhiVZf2lMg6XolbI6pl6' # test123
+                        roles: ['ROLE_USER']
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        login:
+            pattern: ^/auth/login
+            stateless: true
+            provider: users_in_memory   # ✅ Add this line
+            json_login:
+                check_path: /auth/login
+                username_path: email
+                password_path: password
+                success_handler: App\Security\JWTLoginSuccessHandler
+                failure_handler: App\Security\LoginFailureHandler
+        api:
+            pattern: ^/api
+            stateless: true
+            custom_authenticators:
+                - App\Security\JWTAuthenticator
+
+        main:
+            provider: users_in_memory
+            lazy: true
+
+    access_control:
+        - { path: ^/auth/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api,        roles: IS_AUTHENTICATED_FULLY }

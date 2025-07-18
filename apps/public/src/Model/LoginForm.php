@@ -6,7 +6,7 @@ class LoginForm
 {
     public function __construct(
         #[Assert\NotBlank]
-        public string $username,
+        public string $email,
 
         #[Assert\NotBlank]
         public string $password,
