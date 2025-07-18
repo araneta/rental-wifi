@@ -2,13 +2,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../pages/Home.vue';
 import Login from '../pages/Login.vue';
 import Students from '../pages/Students.vue';
-import Dashboard from '../Dashboard.vue';
-import Users from '../Users.vue';
-import Paket from '../Paket.vue';
-import Pelanggan from '../Pelanggan.vue';
-import Tagihan from '../Tagihan.vue';
-import Pembayaran from '../Pembayaran.vue';
-import Rekap from '../Rekap.vue';
+import Dashboard from '../pages/Dashboard.vue';
+import Users from '../pages/Users.vue';
+import Paket from '../pages/Paket.vue';
+import Pelanggan from '../pages/Pelanggan.vue';
+import Tagihan from '../pages/Tagihan.vue';
+import Pembayaran from '../pages/Pembayaran.vue';
+import Rekap from '../pages/Rekap.vue';
 
 const routes = [
   { path: '/', component: Home },

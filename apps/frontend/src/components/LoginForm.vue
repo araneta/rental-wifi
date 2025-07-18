@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import { apiFetch } from '../api';
+
 export default {
   data() {
     return { form: { username: '', password: '' }, error: '' };
@@ -26,15 +28,12 @@ export default {
   methods: {
     async login() {
       try {
-        const res = await fetch('/api/login', {
+        const data = await apiFetch('/login', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(this.form)
         });
-        if (!res.ok) throw new Error('Login failed');
-        const data = await res.json();
         localStorage.setItem('token', data.token);
-        window.location.href = '/index.php';
+        this.$router.push('/');
       } catch (e) {
         this.error = 'Login failed';
       }

@@ -1,2 +1,5 @@
 mysql -u root -p rentalwifi < u8968389_tagihan_internet.sql
 aldo@araneta:~/projects/rental/apps$ docker-compose exec php bash
+ php composer.phar  require drizzle-php/drizzle-php
+ php composer.phar require nelmio/cors-bundle
+agilsuhanda515@gmail.com 515
