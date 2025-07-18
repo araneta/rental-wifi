@@ -12,40 +12,35 @@ use DrizzlePHP\DrizzlePHP;
 use App\Schemas\UsersSchema;
 use App\Model\LoginForm;
 use App\Service\MessageGenerator;
-
+use App\Service\DrizzleService;
 
 final class LoginController extends AbstractController
 {
 	 
 	public function __construct(
         private MessageGenerator $messageGenerator,
-    ) {
-    }
+        private DrizzleService $drizzleService
+    ) {}
+    
+    
     #[Route('/api/login', name: 'app_login')]
     public function index(#[MapRequestPayload] LoginForm $form): JsonResponse
     {
 		$message = $this->messageGenerator->getHappyMessage();
 		
-		// Database connection
-		$pdo = new \PDO('mysql:host=172.17.0.1;dbname=rentalwifi', 'rentalwifi', 'willamette');
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$db = $this->drizzleService->getDb();
 
-		$db = new DrizzlePHP($pdo);
+        $users = $db->select(UsersSchema::class)
+            ->where('email', '=', $form->username)
+            ->where('password', '=', $form->password)
+            ->orderBy('name', 'ASC')
+            ->limit(10)
+            ->get();
 
-		// Basic select
-		$users = $db->select(UsersSchema::class)
-			->where('email', '=', $form->username)
-			->where('password', '=', $form->password)
-			->orderBy('name', 'ASC')
-			->limit(10)
-			->get();
-		
         return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/LoginController.php',
-            'users'=> $users,
-            'form'=>$form,
-            'message'=>$message
+            'message' => $this->messageGenerator->getHappyMessage(),
+            'users' => $users,
+            'form' => $form,
         ]);
     }
 }

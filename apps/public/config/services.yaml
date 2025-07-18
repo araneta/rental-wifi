@@ -16,5 +16,11 @@ services:
     App\:
         resource: '../src/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Register PdoFactory as a factory for PDO
+    App\Database\PdoFactory:
+        factory: ['App\Database\PdoFactory', 'create']
+
+    # Register DrizzleService with PDO injected
+    App\Service\DrizzleService:
+        arguments:
+            $pdo: '@App\Database\PdoFactory'
