@@ -1,7 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../pages/Home.vue';
-import Login from '../pages/Login.vue';
-import Students from '../pages/Students.vue';
 import Dashboard from '../Dashboard.vue';
 import Users from '../Users.vue';
 import Paket from '../Paket.vue';
@@ -11,10 +8,8 @@ import Pembayaran from '../Pembayaran.vue';
 import Rekap from '../Rekap.vue';
 
 const routes = [
-  { path: '/', component: Home },
-  { path: '/login', component: Login },
-  { path: '/students', component: Students, meta: { requiresAuth: true } },
-	{ path: '/users', component: Users },
+  { path: '/', component: Dashboard },
+  { path: '/users', component: Users },
   { path: '/paket', component: Paket },
   { path: '/pelanggan', component: Pelanggan },
   { path: '/tagihan', component: Tagihan },
@@ -27,11 +22,4 @@ const router = createRouter({
   routes
 });
 
-// Auth guard
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
-  if (to.meta.requiresAuth && !token) next('/login');
-  else next();
-});
-
-export default router;
+export default router; 
