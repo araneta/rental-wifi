@@ -2,18 +2,20 @@
 // src/Controller/AuthController.php
 namespace App\Controller;
 
+use App\Schemas\UsersSchema;
+use App\Service\DrizzleService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Service\DrizzleService;
-use Firebase\JWT\JWT;
-use App\Schemas\UsersSchema;
+use App\Service\JWTService;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class LoginController extends AbstractController
 {
     public function __construct(
-        private DrizzleService $drizzleService
+        private DrizzleService $drizzleService,
+        private JWTService $jwtService
     ) {}
 
     #[Route('/auth/login', name: 'auth_login', methods: ['POST'])]
@@ -37,7 +39,7 @@ class LoginController extends AbstractController
         if (!$user) {
             return $this->json(['error' => 'Invalid credentialsx'], 401);
         }
-
+        /*
         $payload = [
             'id' => $user['id'],
             'email' => $user['email'],
@@ -46,7 +48,8 @@ class LoginController extends AbstractController
 
         $jwtSecret = $_ENV['JWT_SECRET'] ?? 'your_jwt_secret';
         $token = JWT::encode($payload, $jwtSecret, 'HS256');
-
+        */
+        $token = $this->jwtService->createToken(UsersSchema::fromArray($user));
         return $this->json(['token' => $token]);
     }
 }

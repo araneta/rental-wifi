@@ -14,13 +14,13 @@ const routes = [
   { path: '/', component: Home },
   { path: '/login', component: Login },
   { path: '/students', component: Students, meta: { requiresAuth: true } },
-	{ path: '/users', component: Users },
-  { path: '/paket', component: Paket },
-  { path: '/pelanggan', component: Pelanggan },
-  { path: '/tagihan', component: Tagihan },
-  { path: '/pembayaran', component: Pembayaran },
-  { path: '/rekap', component: Rekap },
-  { path: '/dashboard', component: Dashboard }
+	{ path: '/users', component: Users, meta: { requiresAuth: true } },
+  { path: '/paket', component: Paket, meta: { requiresAuth: true } },
+  { path: '/pelanggan', component: Pelanggan , meta: { requiresAuth: true }},
+  { path: '/tagihan', component: Tagihan, meta: { requiresAuth: true } },
+  { path: '/pembayaran', component: Pembayaran, meta: { requiresAuth: true } },
+  { path: '/rekap', component: Rekap, meta: { requiresAuth: true } },
+  { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true } }
 ];
 
 const router = createRouter({

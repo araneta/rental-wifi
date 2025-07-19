@@ -3,3 +3,8 @@ aldo@araneta:~/projects/rental/apps$ docker-compose exec php bash
  php composer.phar  require drizzle-php/drizzle-php
  php composer.phar require nelmio/cors-bundle
 agilsuhanda515@gmail.com 515
+
+
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"agilsuhanda515@gmail.com","password":"515"}'

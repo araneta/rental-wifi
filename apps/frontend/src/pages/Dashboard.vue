@@ -43,18 +43,34 @@
 </template>
 
 <script>
+import { apiFetch } from '../api';
+
 export default {
   name: 'Dashboard',
   data() {
     return {
-      totalUsers: 10, // mock data
-      totalPelanggan: 25, // mock data
-      totalTagihan: 5, // mock data
-      totalPembayaran: 20 // mock data
+      totalUsers: 0,
+      totalPelanggan: 0,
+      totalTagihan: 0,
+      totalPembayaran: 0,
+      error: null
+    };
+  },
+  async mounted() {
+    try {
+      const data = await apiFetch('/analytics', { method: 'GET' });
+      console.log('data', data);
+      this.totalUsers = data.totalUsers;
+      this.totalPelanggan = data.totalPelanggan;
+      this.totalTagihan = data.totalTagihan;
+      this.totalPembayaran = data.totalPembayaran;
+    } catch (e) {
+      console.error('Fetch failed', e);
+      this.error = 'Gagal memuat data dashboard.';
     }
   }
-}
+};
 </script>
 
 <style scoped>
-</style> 
+</style>
