@@ -100,7 +100,7 @@ final class UserController extends AbstractController {
                 ->first();
 
         if ($user) {
-            return $this->json(['error' => 'Email already exist'], 401);
+            return $this->json(['error' => 'Email already exist'], 409);
         }
 
         // Insert with validation
@@ -116,4 +116,63 @@ final class UserController extends AbstractController {
         //$token = $this->jwtService->createToken(UsersSchema::fromArray($user));
         return $this->json(['success' => $ret, 'user'=>$newUser]);
     }
+    
+    #[Route('/users/{id}', name: 'get_user', methods: ['GET'])]
+    public function get(Request $request, TokenStorageInterface $tokenStorage,  int $id): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $user = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+        $user = $db->select(UsersSchema::class)
+                ->where('id', '=', $id)
+                ->first();
+
+        return $this->json([
+                    'user' => $user,
+        ]);
+    }
+    
+    #[Route('/users/{id}', name: 'get_user', methods: ['PUT'])]
+    public function update(Request $request, TokenStorageInterface $tokenStorage,  int $id, #[MapRequestPayload] UserEntryForm $existingUser): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $user = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+        $user1 = $db->select(UsersSchema::class)
+                ->where('id', '=', $id)
+                ->first();
+        
+        if (!$user) {
+            return $this->json(['error' => 'User does not exist'], 404);
+        }
+        $user2 = $db->select(UsersSchema::class)
+                ->where('email', '=', $existingUser->email)
+                ->first();
+
+        if ($user2 && $user2->id != $user1->id) {
+            return $this->json(['error' => 'Email already exist'], 409);
+        }
+        // Update with validation
+        $db->update(UsersSchema::class)
+        ->set(['name'=>$existingUser->name])
+        ->set(['email'=>$existingUser->email])
+        ->set(['role'=>$existingUser->role])        
+        ->set(['password'=> password_hash($existingUser->password, PASSWORD_DEFAULT)])                
+         ->where('id','=',$id)
+         ->execute();
+        return $this->json([
+                    'user' => $user,
+        ]);
+    }
+    
 }
