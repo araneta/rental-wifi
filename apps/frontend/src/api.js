@@ -21,6 +21,10 @@ export async function apiFetch(url, options = {}) {
     ...(token ? { Authorization: 'Bearer ' + token } : {})
   };
   const res = await fetch(base_api_url+url, { ...options, headers });
-  if (!res.ok) throw new Error('API error');
+  if (!res.ok){
+	  localStorage.clear();
+	  window.location.href = '/login';
+		throw new Error('API error');
+   }
   return res.json();
 }

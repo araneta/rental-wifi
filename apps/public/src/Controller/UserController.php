@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Schemas\PelangganSchema;
 use App\Schemas\UsersSchema;
 use App\Service\DrizzleService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -49,7 +50,7 @@ final class UserController extends AbstractController
         $totalUsers = $db->select(UsersSchema::class)
             ->count();
         
-        $totalPelanggan = $db->select(UsersSchema::class)
+        $totalPelanggan = $db->select(PelangganSchema::class)
             ->count();
 
         return $this->json([            

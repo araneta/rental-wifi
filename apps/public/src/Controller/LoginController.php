@@ -39,16 +39,7 @@ class LoginController extends AbstractController
         if (!$user) {
             return $this->json(['error' => 'Invalid credentialsx'], 401);
         }
-        /*
-        $payload = [
-            'id' => $user['id'],
-            'email' => $user['email'],
-            'exp' => time() + 3600
-        ];
-
-        $jwtSecret = $_ENV['JWT_SECRET'] ?? 'your_jwt_secret';
-        $token = JWT::encode($payload, $jwtSecret, 'HS256');
-        */
+        
         $token = $this->jwtService->createToken(UsersSchema::fromArray($user));
         return $this->json(['token' => $token]);
     }

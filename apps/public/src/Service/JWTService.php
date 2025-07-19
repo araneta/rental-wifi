@@ -33,6 +33,7 @@ class JWTService
         try {
             return (array) JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
         } catch (Exception $e) {
+            echo $e->getMessage();
             return null;
         }
     }
