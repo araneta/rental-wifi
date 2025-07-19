@@ -18,6 +18,9 @@
 
 <script>
 import { apiFetch } from '../api';
+import { useToast } from 'vue-toastification';
+const toast = useToast();
+
 
 export default {
   data() {
@@ -33,6 +36,7 @@ export default {
         console.log('data',data);
         this.$router.push('/users');
       } catch (e) {
+		toast.error(e.message.error);
 		console.log('err',e);
         this.error = 'Add user failed';
       }

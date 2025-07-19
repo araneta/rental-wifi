@@ -93,14 +93,6 @@ final class UserController extends AbstractController {
 
     #[Route('/users', name: 'create_user', methods: ['POST'])]
     public function create(#[MapRequestPayload] UserEntryForm $newUser): JsonResponse {
-        /* $data = json_decode($request->getContent(), true);
-          $email = $data['email'] ?? null;
-          $password = $data['password'] ?? null;
-
-          if (!$email || !$password) {
-          return $this->json(['error' => 'Email and password required'], 400);
-          } */
-
         $db = $this->drizzleService->getDb();
 
         $user = $db->select(UsersSchema::class)

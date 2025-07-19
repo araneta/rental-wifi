@@ -18,20 +18,20 @@ async function handleFetch(fullUrl, options = {}, redirectOnFail = false) {
       const errorText = await res.text().catch(() => '');
       console.error('API Error Response:', res.status, errorText);
 
-      alert(`API Error ${res.status}: ${errorText || res.statusText}`);
+      //alert(`API Error ${res.status}: ${errorText || res.statusText}`);
 
       if (redirectOnFail) {
         //localStorage.clear();
         //window.location.href = '/login';
       }
 
-      throw new Error(`API error: ${res.status}`);
+      throw new Error(`API error: ${res.statusText}`);
     }
 
     return await res.json();
   } catch (err) {
     console.error('Fetch failed:', err);
-    alert(`Network or server error: ${err.message}`);
+    //alert(`Network or server error: ${err.message}`);
 
     if (redirectOnFail) {
       //localStorage.clear();
