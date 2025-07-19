@@ -69,4 +69,24 @@ final class UserController extends AbstractController
             'totalPembayaran'=>$totalPembayaran,
         ]);
     }
+    
+    #[Route('/users', name:'all_users', methods:['GET'])]
+    public function all(Request $request, TokenStorageInterface $tokenStorage): JsonResponse{
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $user = $token->getUser();
+        
+        
+        $db = $this->drizzleService->getDb();
+
+        $users = $db->select(UsersSchema::class)
+            ->get();
+        
+        return $this->json([            
+            'users' => $users,            
+        ]);
+    }
 }

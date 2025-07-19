@@ -29,15 +29,25 @@
 </template>
 
 <script>
+import { apiFetch } from '../api';
+
 export default {
   name: 'Users',
   data() {
     return {
       users: [
-        { id: 1, name: 'Aldo', email: 'aldo@mail.com', role: 'admin' },
-        { id: 2, name: 'Budi', email: 'budi@mail.com', role: 'user' },
-        { id: 3, name: 'Cici', email: 'cici@mail.com', role: 'user' }
+       
       ]
+    }
+  },
+  async mounted() {
+    try {
+      const data = await apiFetch('/users', { method: 'GET' });
+      console.log('data', data);
+      this.users = data.users;      
+    } catch (e) {
+      console.error('Fetch failed', e);
+      this.error = 'Gagal memuat data dashboard.';
     }
   }
 }
