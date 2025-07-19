@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>Manajemen Pengguna</h2>
-    <button class="btn btn-primary mb-3">Tambah User</button>
+    <a class="btn btn-primary mb-3" href="/users/create">Tambah User</a>
     <table class="table table-bordered" width="100%">
       <thead>
         <tr>

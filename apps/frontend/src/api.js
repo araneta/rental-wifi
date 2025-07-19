@@ -21,8 +21,8 @@ async function handleFetch(fullUrl, options = {}, redirectOnFail = false) {
       alert(`API Error ${res.status}: ${errorText || res.statusText}`);
 
       if (redirectOnFail) {
-        localStorage.clear();
-        window.location.href = '/login';
+        //localStorage.clear();
+        //window.location.href = '/login';
       }
 
       throw new Error(`API error: ${res.status}`);
@@ -34,8 +34,8 @@ async function handleFetch(fullUrl, options = {}, redirectOnFail = false) {
     alert(`Network or server error: ${err.message}`);
 
     if (redirectOnFail) {
-      localStorage.clear();
-      window.location.href = '/login';
+      //localStorage.clear();
+      //window.location.href = '/login';
     }
 
     throw err;
