@@ -23,7 +23,7 @@ class TagihanSchema extends Schema
     #[Column('jumlah', 'decimal')]
     public float $jumlah;
 
-    #[Column('status', 'string', default: 'belum bayar')]
+    #[Column('status', 'string')]
     public string $status;
 
     #[Column('tanggal_bayar', 'date', nullable: true)]

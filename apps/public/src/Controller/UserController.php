@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Schemas\PelangganSchema;
+use App\Schemas\PembayaranSchema;
+use App\Schemas\TagihanSchema;
 use App\Schemas\UsersSchema;
 use App\Service\DrizzleService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -52,10 +54,19 @@ final class UserController extends AbstractController
         
         $totalPelanggan = $db->select(PelangganSchema::class)
             ->count();
+        //
+        $totalTagihan = $db->select(TagihanSchema::class)
+            ->where('status', '=', 'belum bayar')
+            ->count();
+        
+        $totalPembayaran = $db->select(PembayaranSchema::class)
+            ->count();
 
         return $this->json([            
             'totalUsers' => $totalUsers,
             'totalPelanggan' => $totalPelanggan,
+            'totalTagihan'=>$totalTagihan,
+            'totalPembayaran'=>$totalPembayaran,
         ]);
     }
 }
