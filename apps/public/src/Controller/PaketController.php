@@ -9,7 +9,7 @@ namespace App\Controller;
 
 use App\Model\PaketEntryForm;
 use App\Schemas\PaketSchema;
-use App\Schemas\UsersSchema;
+use App\Schemas\UserSchema;
 use App\Service\DrizzleService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +39,7 @@ class PaketController extends AbstractController {
             return $this->json(['error' => 'Token not found'], 401);
         }
 
-        $user = $token->getUser();
+        $paket = $token->getUser();
 
         $db = $this->drizzleService->getDb();
 
@@ -73,8 +73,68 @@ class PaketController extends AbstractController {
                 ])
                 ->execute();
 
-        //$token = $this->jwtService->createToken(UsersSchema::fromArray($user));
+        //$token = $this->jwtService->createToken(PaketSchema::fromArray($paket));
         return $this->json(['success' => $ret, 'paket'=>$newPaket]);
+    }
+    
+    #[Route('/pakets/{id}', name: 'get_paket', methods: ['GET'])]
+    public function get(Request $request, TokenStorageInterface $tokenStorage,  int $id): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $paket = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+        $paket = $db->select(PaketSchema::class)
+                ->where('id', '=', $id)
+                ->first();
+
+        return $this->json([
+                    'paket' => $paket,
+        ]);
+    }
+    #[Route('/pakets/{id}', name: 'update_paket', methods: ['PUT'])]
+    public function update(Request $request, TokenStorageInterface $tokenStorage,  int $id, #[MapRequestPayload] UserEntryForm $existingPaket): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $paket = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+        $paketArr1 = $db->select(PaketSchema::class)
+                ->where('id', '=', $id)
+                ->first();
+        
+        if (!$paketArr1) {
+            return $this->json(['error' => 'Paket does not exist'], 404);
+        }
+        $paket1 = PaketSchema::fromArray($paketArr1);
+        
+        $paketArr2 = $db->select(PaketSchema::class)
+                ->where('nama', '=', $existingPaket->nama)
+                ->first();
+        $paket2 = PaketSchema::fromArray($paketArr2);
+        if ($paket2 && $paket2->id != $paket1->id) {
+            return $this->json(['error' => 'Email already exist'], 409);
+        }
+        $pass = $paket1->password;
+        if(!empty($existingPaket->password)){
+            $pass = password_hash($existingPaket->password, PASSWORD_DEFAULT);
+        }
+        // Update with validation
+        $ret = $db->update(PaketSchema::class)
+        ->set(['name'=>$existingPaket->name,'email'=>$existingPaket->email,'role'=>$existingPaket->role, 'password'=> $pass])                
+         ->where('id','=',$id)
+         ->execute();
+        return $this->json([
+                    'status' => $ret,
+        ]);
     }
 }
 

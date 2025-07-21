@@ -91,7 +91,7 @@ final class UserController extends AbstractController {
         ]);
     }
     
-     #[Route('/users/{id}', name: 'get_user', methods: ['GET'])]
+    #[Route('/users/{id}', name: 'get_user', methods: ['GET'])]
     public function get(Request $request, TokenStorageInterface $tokenStorage,  int $id): JsonResponse {
         $token = $tokenStorage->getToken();
         if (!$token) {

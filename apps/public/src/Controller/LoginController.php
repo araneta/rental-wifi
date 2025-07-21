@@ -28,19 +28,21 @@ class LoginController extends AbstractController
         if (!$email || !$password) {
             return $this->json(['error' => 'Email and password required'], 400);
         }
-
+        
         $db = $this->drizzleService->getDb();
-
+        
         $user = $db->select(UsersSchema::class)
-            ->where('email', '=', $email)
-            ->where('password', '=', $password) // ❗ change to password_verify() if using hashes
+            ->where('email', '=', $email)            
             ->first();
 
         if (!$user) {
             return $this->json(['error' => 'Invalid credentialsx'], 401);
         }
         
-        $token = $this->jwtService->createToken(UsersSchema::fromArray($user));
-        return $this->json(['token' => $token]);
+        if(password_verify($password, $user['password'])){
+            $token = $this->jwtService->createToken(UsersSchema::fromArray($user));
+            return $this->json(['token' => $token]);
+        }
+        return $this->json(['error' => 'Invalid credentials'], 401);
     }
 }

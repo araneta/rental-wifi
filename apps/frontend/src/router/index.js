@@ -10,6 +10,7 @@ import UpdateUser from '../pages/users/UpdateUser.vue';
 
 import Paket from '../pages/paket/Paket.vue';
 import CreatePaket from '../pages/paket/CreatePaket.vue';
+import UpdatePaket from '../pages/paket/UpdatePaket.vue';
 
 import Pelanggan from '../pages/Pelanggan.vue';
 import Tagihan from '../pages/Tagihan.vue';
@@ -27,6 +28,7 @@ const routes = [
 
 	{ path: '/pakets', component: Paket, meta: { requiresAuth: true } },
 	{path:'/pakets/create', component: CreatePaket, meta:{requiredAuth: true}},
+	{ path: '/pakets/:id', component: UpdatePaket, meta: { requiresAuth: true } },
 	
   { path: '/pelanggan', component: Pelanggan , meta: { requiresAuth: true }},
   { path: '/tagihan', component: Tagihan, meta: { requiresAuth: true } },
