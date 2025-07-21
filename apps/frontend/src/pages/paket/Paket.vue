@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>Daftar Paket Internet</h2>
-    <button class="btn btn-primary mb-3">Tambah Paket</button>
+    <a class="btn btn-primary mb-3" href="/pakets/create">Tambah Paket</a>
     <table class="table table-bordered">
       <thead>
         <tr>
@@ -21,7 +21,7 @@
           <td>Rp{{ paket.harga.toLocaleString('id-ID') }}</td>
           <td>{{ paket.deskripsi }}</td>
           <td>
-            <button class="btn btn-warning">Edit</button>
+            <a class="btn btn-warning" :href="`/pakets/${paket.id}`">Edit</a>&nbsp;
             <button class="btn btn-danger">Hapus</button>
           </td>
         </tr>
@@ -31,14 +31,24 @@
 </template>
 
 <script>
+import { apiFetch } from '../../api'; // or your API handler
 export default {
   name: 'Paket',
   data() {
     return {
       pakets: [
-        { id: 1, nama: 'Basic', kecepatan: '10 Mbps', harga: 150000, deskripsi: 'Paket dasar' },
-        { id: 2, nama: 'Premium', kecepatan: '50 Mbps', harga: 350000, deskripsi: 'Paket cepat' }
+        
       ]
+    }
+  },
+  async mounted() {
+    try {
+      const data = await apiFetch('/pakets', { method: 'GET' });
+      console.log('data', data);
+      this.pakets = data.pakets;      
+    } catch (e) {
+      console.error('Fetch failed', e);
+      this.error = 'Gagal memuat data dashboard.';
     }
   }
 }

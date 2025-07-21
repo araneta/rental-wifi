@@ -15,7 +15,7 @@
                         <a class="nav-link" href="/users">Users</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/paket">Paket</a>
+                        <a class="nav-link" href="/pakets">Paket</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/pelanggan">Pelanggan</a>

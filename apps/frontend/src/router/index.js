@@ -8,21 +8,26 @@ import Users from '../pages/users/Users.vue';
 import CreateUser from '../pages/users/CreateUser.vue';
 import UpdateUser from '../pages/users/UpdateUser.vue';
 
-import Paket from '../pages/Paket.vue';
+import Paket from '../pages/paket/Paket.vue';
+import CreatePaket from '../pages/paket/CreatePaket.vue';
+
 import Pelanggan from '../pages/Pelanggan.vue';
 import Tagihan from '../pages/Tagihan.vue';
 import Pembayaran from '../pages/Pembayaran.vue';
 import Rekap from '../pages/Rekap.vue';
 
 const routes = [
-  { path: '/', component: Home },
-  { path: '/login', component: Login },
-  { path: '/students', component: Students, meta: { requiresAuth: true } },
+	{ path: '/', component: Home },
+	{ path: '/login', component: Login },
+	{ path: '/students', component: Students, meta: { requiresAuth: true } },
+	
 	{ path: '/users', component: Users, meta: { requiresAuth: true } },
 	{path:'/users/create', component: CreateUser, meta:{requiredAuth: true}},
 	{ path: '/users/:id', component: UpdateUser, meta: { requiresAuth: true } },
 
-  { path: '/paket', component: Paket, meta: { requiresAuth: true } },
+	{ path: '/pakets', component: Paket, meta: { requiresAuth: true } },
+	{path:'/pakets/create', component: CreatePaket, meta:{requiredAuth: true}},
+	
   { path: '/pelanggan', component: Pelanggan , meta: { requiresAuth: true }},
   { path: '/tagihan', component: Tagihan, meta: { requiresAuth: true } },
   { path: '/pembayaran', component: Pembayaran, meta: { requiresAuth: true } },
