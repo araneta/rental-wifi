@@ -29,8 +29,11 @@ class PaketSchema extends Schema
     #[Column('created_at', 'datetime')]
     public string $createdAt;
 
-    public static function fromArray(array $data): PaketSchema
+    public static function fromArray(?array $data): ?PaketSchema
     {
+        if(empty($data)){
+            return NULL;
+        }
         $paket = new PaketSchema();
         $paket->id = $data['id'] ?? 0;
         $paket->nama = $data['nama'] ?? '';

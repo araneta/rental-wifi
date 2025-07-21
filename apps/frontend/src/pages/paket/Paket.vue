@@ -22,7 +22,7 @@
           <td>{{ paket.deskripsi }}</td>
           <td>
             <a class="btn btn-warning" :href="`/pakets/${paket.id}`">Edit</a>&nbsp;
-            <button class="btn btn-danger">Hapus</button>
+            <button class="btn btn-danger" @click="deletePaket(paket)">Hapus</button>
           </td>
         </tr>
       </tbody>
@@ -31,28 +31,43 @@
 </template>
 
 <script>
-import { apiFetch } from '../../api'; // or your API handler
+import { apiFetch } from '../../api'; // adjust as needed
+import { useToast } from 'vue-toastification';
+const toast = useToast();
+
 export default {
   name: 'Paket',
   data() {
     return {
-      pakets: [
-        
-      ]
+      pakets: []
+    };
+  },
+  methods: {
+    async deletePaket(paket) {
+      const confirmed = confirm(`Yakin ingin menghapus paket "${paket.nama}"?`);
+      if (!confirmed) return;
+
+      try {
+        await apiFetch(`/pakets/${paket.id}`, { method: 'DELETE' });
+        this.pakets = this.pakets.filter(p => p.id !== paket.id);
+        toast.success(`Paket "${paket.nama}" berhasil dihapus.`);
+      } catch (err) {
+        console.error(err);
+        toast.error('Gagal menghapus paket.');
+      }
     }
   },
   async mounted() {
     try {
       const data = await apiFetch('/pakets', { method: 'GET' });
-      console.log('data', data);
-      this.pakets = data.pakets;      
+      this.pakets = data.pakets;
     } catch (e) {
       console.error('Fetch failed', e);
-      this.error = 'Gagal memuat data dashboard.';
+      toast.error('Gagal memuat data paket.');
     }
   }
-}
+};
 </script>
 
 <style scoped>
-</style> 
+</style>

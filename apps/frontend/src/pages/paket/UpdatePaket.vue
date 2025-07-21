@@ -59,7 +59,8 @@ export default {
   async created() {
     const id = this.$route.params.id;
     try {
-      const data = await apiFetch(`/paket/${id}`);
+      const datax = await apiFetch(`/pakets/${id}`);
+      const data = datax.paket;
       this.form = {
         nama: data.nama,
         kecepatan: data.kecepatan,
@@ -74,14 +75,14 @@ export default {
     async submitForm() {
       const id = this.$route.params.id;
       try {
-        await apiFetch(`/paket/${id}`, {
+        await apiFetch(`/pakets/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(this.form),
         });
-        this.$router.push('/paket');
+        this.$router.push('/pakets');
       } catch (err) {
         console.error('Gagal menyimpan paket:', err);
       }

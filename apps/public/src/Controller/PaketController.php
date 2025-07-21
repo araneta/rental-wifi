@@ -97,7 +97,7 @@ class PaketController extends AbstractController {
         ]);
     }
     #[Route('/pakets/{id}', name: 'update_paket', methods: ['PUT'])]
-    public function update(Request $request, TokenStorageInterface $tokenStorage,  int $id, #[MapRequestPayload] UserEntryForm $existingPaket): JsonResponse {
+    public function update(Request $request, TokenStorageInterface $tokenStorage,  int $id, #[MapRequestPayload] PaketEntryForm $existingPaket): JsonResponse {
         $token = $tokenStorage->getToken();
         if (!$token) {
             return $this->json(['error' => 'Token not found'], 401);
@@ -123,15 +123,38 @@ class PaketController extends AbstractController {
         if ($paket2 && $paket2->id != $paket1->id) {
             return $this->json(['error' => 'Email already exist'], 409);
         }
-        $pass = $paket1->password;
-        if(!empty($existingPaket->password)){
-            $pass = password_hash($existingPaket->password, PASSWORD_DEFAULT);
-        }
+        
         // Update with validation
         $ret = $db->update(PaketSchema::class)
-        ->set(['name'=>$existingPaket->name,'email'=>$existingPaket->email,'role'=>$existingPaket->role, 'password'=> $pass])                
+        ->set(['nama'=>$existingPaket->nama,'kecepatan'=>$existingPaket->kecepatan,'harga'=>$existingPaket->harga, 'deskripsi'=> $existingPaket->deskripsi])                
          ->where('id','=',$id)
          ->execute();
+        return $this->json([
+                    'status' => $ret,
+        ]);
+    }
+    
+    #[Route('/pakets/{id}', name: 'delete_paket', methods: ['DELETE'])]
+    public function delete(Request $request, TokenStorageInterface $tokenStorage,  int $id): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $paket = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+        $paketArr1 = $db->select(PaketSchema::class)
+                ->where('id', '=', $id)
+                ->first();
+        
+        if (!$paketArr1) {
+            return $this->json(['error' => 'Paket does not exist'], 404);
+        }
+        $ret = $db->delete(PaketSchema::class)
+        ->where('id','=',$id)
+        ->execute();
         return $this->json([
                     'status' => $ret,
         ]);
