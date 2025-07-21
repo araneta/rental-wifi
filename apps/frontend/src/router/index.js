@@ -12,7 +12,10 @@ import Paket from '../pages/paket/Paket.vue';
 import CreatePaket from '../pages/paket/CreatePaket.vue';
 import UpdatePaket from '../pages/paket/UpdatePaket.vue';
 
-import Pelanggan from '../pages/Pelanggan.vue';
+import Pelanggan from '../pages/pelanggan/Pelanggan.vue';
+import CreatePelanggan from '../pages/pelanggan/CreatePelanggan.vue';
+import UpdatePelanggan from '../pages/pelanggan/UpdatePelanggan.vue';
+
 import Tagihan from '../pages/Tagihan.vue';
 import Pembayaran from '../pages/Pembayaran.vue';
 import Rekap from '../pages/Rekap.vue';

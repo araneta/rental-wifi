@@ -23,7 +23,7 @@ class PelangganSchema extends Schema
     #[Column('no_hp', 'text')]
     public string $noHp;
 
-    #[Column('status', 'string', default: 'aktif')]
+    #[Column('status', 'string')]
     public string $status;
 
     #[Column('created_at', 'datetime')]
@@ -49,4 +49,19 @@ class PelangganSchema extends Schema
 
         return $pelanggan;
     }
+    
+    public static function getColumns(): array
+    {
+        return [
+            'id' => ['property' => 'id', 'type' => 'int'],
+            'nama' => ['property' => 'nama', 'type' => 'string'],
+            'alamat' => ['property' => 'alamat', 'type' => 'text'],
+            'no_hp' => ['property' => 'noHp', 'type' => 'text'],
+            'status' => ['property' => 'status', 'type' => 'string'],
+            'created_at' => ['property' => 'createdAt', 'type' => 'datetime'],
+            'paket_id' => ['property' => 'paketId', 'type' => 'int'],
+            'pop' => ['property' => 'pop', 'type' => 'text'],
+        ];
+    }
+
 }

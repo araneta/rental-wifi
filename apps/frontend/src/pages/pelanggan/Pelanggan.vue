@@ -28,7 +28,7 @@
             <span v-else>❌ Nonaktif</span>
           </td>
           <td>
-            <button class="btn btn-warning">Edit</button>
+            <button class="btn btn-warning">Edit</button>&nbsp;
             <button class="btn btn-danger">Hapus</button>
           </td>
         </tr>
@@ -38,14 +38,41 @@
 </template>
 
 <script>
+import { apiFetch } from '../../api' // Your custom API handler
+import { useToast } from 'vue-toastification';
+const toast = useToast();
+
 export default {
   name: 'Pelanggan',
   data() {
     return {
       pelanggans: [
-        { id: 1, nama: 'Andi', alamat: 'Jl. Mawar', no_hp: '08123456789', paket_nama: 'Basic', pop: 'POP1', status: 'aktif' },
-        { id: 2, nama: 'Budi', alamat: 'Jl. Melati', no_hp: '08129876543', paket_nama: '', pop: 'POP2', status: 'nonaktif' }
+        
       ]
+    }
+  },
+  methods: {
+    async deletePaket(pelanggan) {
+      const confirmed = confirm(`Yakin ingin menghapus pelanggan "${pelanggan.nama}"?`);
+      if (!confirmed) return;
+
+      try {
+        await apiFetch(`/pelanggans/${pelanggan.id}`, { method: 'DELETE' });
+        this.pelanggans = this.pelanggans.filter(p => p.id !== pelanggan.id);
+        toast.success(`Paket "${pelanggan.nama}" berhasil dihapus.`);
+      } catch (err) {
+        console.error(err);
+        toast.error('Gagal menghapus pelanggan.');
+      }
+    }
+  },
+  async mounted() {
+    try {
+      const data = await apiFetch('/pelanggans', { method: 'GET' });
+      this.pelanggans = data.pelanggans;
+    } catch (e) {
+      console.error('Fetch failed', e);
+      toast.error('Gagal memuat data pelanggan.');
     }
   }
 }
