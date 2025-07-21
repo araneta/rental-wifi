@@ -18,9 +18,9 @@
       </div>
     </form>
     <!-- Tombol Tambah -->
-    <button class="btn btn-primary mb-3">Tambah Manual</button>
-    <button class="btn btn-warning mb-3">Tambah Keseluruhan</button>
-    <button class="btn btn-success mb-3">Export Excel</button>
+    <button class="btn btn-primary mb-3">Tambah Manual</button>&nbsp;
+    <button class="btn btn-warning mb-3">Tambah Keseluruhan</button>&nbsp;
+    <button class="btn btn-success mb-3">Export Excel</button>&nbsp;
     <div class="table-responsive">
       <table class="table table-bordered" width="100%">
         <thead>
@@ -57,6 +57,10 @@
 </template>
 
 <script>
+import { apiFetch } from '../../api' // Your custom API handler
+import { useToast } from 'vue-toastification';
+const toast = useToast();
+
 export default {
   name: 'Tagihan',
   data() {
@@ -64,8 +68,7 @@ export default {
       filterStatus: '',
       filterBulanTahun: '',
       tagihans: [
-        { id: 1, pelanggan: 'Andi', jumlah: 150000, status: 'belum bayar', bulan_tahun: '2024-06', petugas: 'Aldo' },
-        { id: 2, pelanggan: 'Budi', jumlah: 150000, status: 'lunas', bulan_tahun: '2024-05', petugas: 'Budi' }
+        
       ]
     }
   },
@@ -77,7 +80,17 @@ export default {
         return statusMatch && bulanTahunMatch;
       });
     }
+  },
+  async mounted() {
+    try {
+      const data = await apiFetch('/tagihans?status='+this.filterStatus, { method: 'GET' });
+      this.tagihans = data.tagihans;
+    } catch (e) {
+      console.error('Fetch failed', e);
+      toast.error('Gagal memuat data tagihan.');
+    }
   }
+  
 }
 </script>
 
