@@ -49,8 +49,8 @@
         class="form-control mb-2"
       />
 
-      <button type="submit" class="btn btn-primary">Update</button>
-      <router-link to="/pelanggan" class="btn btn-secondary">Batal</router-link>
+      <button type="submit" class="btn btn-primary">Update</button>&nbsp;
+      <router-link to="/pelanggans" class="btn btn-secondary">Batal</router-link>
     </form>
   </div>
 </template>
@@ -75,11 +75,11 @@ export default {
   async mounted() {
     const id = this.$route.params.id;
     try {
-      const data = await apiFetch(`/pelanggan/${id}`, { method: 'GET' });
+      const data = await apiFetch(`/pelanggans/${id}`, { method: 'GET' });
       this.pelanggan = data.pelanggan;
 
-      const paketData = await apiFetch('/paket', { method: 'GET' });
-      this.paketList = paketData.paket;
+      const paketData = await apiFetch('/pakets', { method: 'GET' });
+      this.paketList = paketData.pakets;
     } catch (err) {
       console.error('Error fetching data:', err);
     }
@@ -90,11 +90,11 @@ export default {
     },
     async updatePelanggan() {
       try {
-        await apiFetch(`/pelanggan/${this.pelanggan.id}`, {
+        await apiFetch(`/pelanggans/${this.pelanggan.id}`, {
           method: 'PUT',
           body: JSON.stringify(this.pelanggan)
         });
-        this.$router.push('/pelanggan');
+        this.$router.push('/pelanggans');
       } catch (err) {
         console.error('Update gagal', err);
       }

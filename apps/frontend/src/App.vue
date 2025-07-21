@@ -18,16 +18,16 @@
                         <a class="nav-link" href="/pakets">Paket</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/pelanggan">Pelanggan</a>
+                        <a class="nav-link" href="/pelanggans">Pelanggan</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/tagihan">Tagihan</a>
+                        <a class="nav-link" href="/tagihans">Tagihan</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/pembayaran">Pembayaran</a>
+                        <a class="nav-link" href="/pembayarans">Pembayaran</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/rekap">Rekap</a>
+                        <a class="nav-link" href="/rekaps">Rekap</a>
                     </li>
                 </ul>
             </div>

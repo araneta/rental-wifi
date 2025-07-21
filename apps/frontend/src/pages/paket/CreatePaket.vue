@@ -1,62 +1,59 @@
-<template>
-  <div>
-    <h2>Tambah Paket</h2>
-    <form @submit.prevent="submitForm">
-      <div class="mb-3">
-        <label class="form-label">Nama Paket</label>
-        <input type="text" v-model="form.nama" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Kecepatan</label>
-        <input type="text" v-model="form.kecepatan" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Harga (Rp)</label>
-        <input type="number" v-model.number="form.harga" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Deskripsi</label>
-        <textarea v-model="form.deskripsi" class="form-control"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary">Simpan</button>
-    </form>
-  </div>
-</template>
-
 <script>
-import { apiFetch } from '../../api'; // adjust if needed
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { apiFetch } from '../../api'
+import { useToast } from 'vue-toastification'
 
 export default {
-  name: 'CreatePaket',
-  data() {
-    return {
-      form: {
-        nama: '',
-        kecepatan: '',
-        harga: '',
-        deskripsi: '',
-      },
-    };
-  },
-  methods: {
-    async submitForm() {
-      try {
-        await apiFetch('/pakets', {
-          method: 'POST',
-          body: JSON.stringify(this.form),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        this.$router.push('/pakets');
-      } catch (err) {
-        console.error('Gagal menyimpan paket:', err);
-      }
-    },
-  },
-};
-</script>
+  name: 'CreatePelanggan',
+  setup() {
+    const router = useRouter()
+    const toast = useToast()
 
-<style scoped>
-/* Add your styling here if needed */
-</style>
+    const form = ref({
+      nama: '',
+      alamat: '',
+      noHp: '',
+      paketId: '',
+      status: 'aktif',
+      pop: ''
+    })
+
+    const pakets = ref([])
+
+    onMounted(async () => {
+      try {
+        const response = await apiFetch('/pakets', { method: 'GET' })
+        pakets.value = response.pakets || []
+      } catch (e) {
+        console.error('Gagal memuat paket', e)
+        toast.error('Gagal memuat data paket.')
+      }
+    })
+
+    const submitForm = async () => {
+      try {
+        await apiFetch('/pelanggans', {
+          method: 'POST',
+          body: JSON.stringify(form.value),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+
+        toast.success('Data berhasil disimpan!')
+        router.push('/pakets')
+      } catch (e) {
+        console.error('Gagal menyimpan data', e)
+        toast.error('Gagal menyimpan data.')
+      }
+    }
+
+    return {
+      form,
+      pakets,
+      submitForm
+    }
+  }
+}
+</script>

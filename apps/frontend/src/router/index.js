@@ -33,7 +33,10 @@ const routes = [
 	{path:'/pakets/create', component: CreatePaket, meta:{requiredAuth: true}},
 	{ path: '/pakets/:id', component: UpdatePaket, meta: { requiresAuth: true } },
 	
-  { path: '/pelanggan', component: Pelanggan , meta: { requiresAuth: true }},
+  { path: '/pelanggans', component: Pelanggan , meta: { requiresAuth: true }},
+  {path:'/pelanggans/create', component: CreatePelanggan, meta:{requiredAuth: true}},
+  {path:'/pelanggans/:id', component: UpdatePelanggan, meta:{requiredAuth: true}},
+  
   { path: '/tagihan', component: Tagihan, meta: { requiresAuth: true } },
   { path: '/pembayaran', component: Pembayaran, meta: { requiresAuth: true } },
   { path: '/rekap', component: Rekap, meta: { requiresAuth: true } },

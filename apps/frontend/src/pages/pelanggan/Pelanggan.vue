@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>Daftar Pelanggan</h2>
-    <button class="btn btn-primary mb-3">Tambah Pelanggan</button>
+    <a href="/pelanggans/create" class="btn btn-primary mb-3">Tambah Pelanggan</a>
     <table class="table table-bordered" width="100%">
       <thead>
         <tr>
@@ -28,8 +28,8 @@
             <span v-else>❌ Nonaktif</span>
           </td>
           <td>
-            <button class="btn btn-warning">Edit</button>&nbsp;
-            <button class="btn btn-danger">Hapus</button>
+            <a class="btn btn-warning" :href="`/pelanggans/${pelanggan.id}`">Edit</a>&nbsp;
+            <button class="btn btn-danger" @click="deletePelanggan(pelanggan)">Hapus</button>
           </td>
         </tr>
       </tbody>
@@ -52,14 +52,14 @@ export default {
     }
   },
   methods: {
-    async deletePaket(pelanggan) {
+    async deletePelanggan(pelanggan) {
       const confirmed = confirm(`Yakin ingin menghapus pelanggan "${pelanggan.nama}"?`);
       if (!confirmed) return;
 
       try {
         await apiFetch(`/pelanggans/${pelanggan.id}`, { method: 'DELETE' });
         this.pelanggans = this.pelanggans.filter(p => p.id !== pelanggan.id);
-        toast.success(`Paket "${pelanggan.nama}" berhasil dihapus.`);
+        toast.success(`Pelanggan "${pelanggan.nama}" berhasil dihapus.`);
       } catch (err) {
         console.error(err);
         toast.error('Gagal menghapus pelanggan.');

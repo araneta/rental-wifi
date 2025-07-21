@@ -71,6 +71,7 @@ class PelangganController extends AbstractController {
         $existing = $db->select(PelangganSchema::class)
                 ->where('nama', '=', $newPelanggan->nama)
                 ->first();
+            
 
         if ($existing) {
             return $this->json(['error' => 'Nama pelanggan sudah ada'], 409);
@@ -80,9 +81,12 @@ class PelangganController extends AbstractController {
         $ret = $db->insert(PelangganSchema::class)
                 ->values([
                     'nama' => $newPelanggan->nama,
-                    'kecepatan' => $newPelanggan->kecepatan,
-                    'harga' => $newPelanggan->harga,
-                    'deskripsi' => $newPelanggan->deskripsi,
+                    'alamat' => $newPelanggan->alamat,
+                    'no_hp' => $newPelanggan->no_hp,
+                    'status' => $newPelanggan->status,
+                    'paket_id' => $newPelanggan->paket_id,
+                    'pop' => $newPelanggan->pop,
+                    
                 ])
                 ->execute();
 
@@ -134,12 +138,18 @@ class PelangganController extends AbstractController {
                 ->first();
         $pelanggan2 = PelangganSchema::fromArray($pelangganArr2);
         if ($pelanggan2 && $pelanggan2->id != $pelanggan1->id) {
-            return $this->json(['error' => 'Email already exist'], 409);
+            return $this->json(['error' => 'Nama already exist'], 409);
         }
         
         // Update with validation
         $ret = $db->update(PelangganSchema::class)
-        ->set(['nama'=>$existingPelanggan->nama,'kecepatan'=>$existingPelanggan->kecepatan,'harga'=>$existingPelanggan->harga, 'deskripsi'=> $existingPelanggan->deskripsi])                
+        ->set(['nama'=>$existingPelanggan->nama,
+            'alamat'=>$existingPelanggan->alamat,
+            'no_hp'=>$existingPelanggan->no_hp, 
+            'status'=> $existingPelanggan->status,
+            'paket_id'=> $existingPelanggan->paket_id,
+            'pop'=> $existingPelanggan->pop,
+            ])                
          ->where('id','=',$id)
          ->execute();
         return $this->json([

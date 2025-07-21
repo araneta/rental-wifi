@@ -21,7 +21,7 @@ class PelangganSchema extends Schema
     public string $alamat;
 
     #[Column('no_hp', 'text')]
-    public string $noHp;
+    public string $no_hp;
 
     #[Column('status', 'string')]
     public string $status;
@@ -30,21 +30,24 @@ class PelangganSchema extends Schema
     public string $createdAt;
 
     #[Column('paket_id', 'int', nullable: true)]
-    public ?int $paketId;
+    public ?int $paket_id;
 
     #[Column('pop', 'text')]
     public string $pop;
 
-    public static function fromArray(array $data): PelangganSchema
+    public static function fromArray(?array $data): ?PelangganSchema
     {
+        if(empty($data)){
+            return NULL;
+        }
         $pelanggan = new PelangganSchema();
         $pelanggan->id = $data['id'] ?? 0;
         $pelanggan->nama = $data['nama'] ?? '';
         $pelanggan->alamat = $data['alamat'] ?? '';
-        $pelanggan->noHp = $data['no_hp'] ?? '';
+        $pelanggan->no_hp = $data['no_hp'] ?? '';
         $pelanggan->status = $data['status'] ?? 'aktif';
         $pelanggan->createdAt = $data['created_at'] ?? '';
-        $pelanggan->paketId = isset($data['paket_id']) ? (int) $data['paket_id'] : null;
+        $pelanggan->paket_id = isset($data['paket_id']) ? (int) $data['paket_id'] : null;
         $pelanggan->pop = $data['pop'] ?? '';
 
         return $pelanggan;
@@ -56,10 +59,10 @@ class PelangganSchema extends Schema
             'id' => ['property' => 'id', 'type' => 'int'],
             'nama' => ['property' => 'nama', 'type' => 'string'],
             'alamat' => ['property' => 'alamat', 'type' => 'text'],
-            'no_hp' => ['property' => 'noHp', 'type' => 'text'],
+            'no_hp' => ['property' => 'no_hp', 'type' => 'text'],
             'status' => ['property' => 'status', 'type' => 'string'],
             'created_at' => ['property' => 'createdAt', 'type' => 'datetime'],
-            'paket_id' => ['property' => 'paketId', 'type' => 'int'],
+            'paket_id' => ['property' => 'paket_id', 'type' => 'int'],
             'pop' => ['property' => 'pop', 'type' => 'text'],
         ];
     }

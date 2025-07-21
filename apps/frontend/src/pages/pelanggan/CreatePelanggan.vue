@@ -29,12 +29,16 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import { apiFetch } from '../../api' // Your custom API handler
-import { useToast } from 'vue-toastification';
-const toast = useToast();
+import { useRouter } from 'vue-router'
+import { apiFetch } from '../../api'
+import { useToast } from 'vue-toastification'
+
 export default {
   name: 'CreatePelanggan',
   setup() {
+    const router = useRouter()
+    const toast = useToast()
+
     const form = ref({
       nama: '',
       alamat: '',
@@ -48,16 +52,17 @@ export default {
 
     onMounted(async () => {
       try {
-        const response = await apiFetch('/pelanggans', { method: 'GET' })
+        const response = await apiFetch('/pakets', { method: 'GET' })
         pakets.value = response.pakets || []
       } catch (e) {
         console.error('Gagal memuat paket', e)
+        toast.error('Gagal memuat data paket.')
       }
     })
 
     const submitForm = async () => {
       try {
-        const response = await apiFetch('/pelanggans', {
+        await apiFetch('/pelanggans', {
           method: 'POST',
           body: JSON.stringify(form.value),
           headers: {
@@ -65,11 +70,11 @@ export default {
           }
         })
 
-        alert('Data berhasil disimpan!')
-        // Optionally redirect
+        toast.success('Data berhasil disimpan!')
+        router.push('/pelanggans')
       } catch (e) {
         console.error('Gagal menyimpan data', e)
-        alert('Gagal menyimpan data.')
+        toast.error('Gagal menyimpan data.')
       }
     }
 
@@ -81,3 +86,4 @@ export default {
   }
 }
 </script>
+
