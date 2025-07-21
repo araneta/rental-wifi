@@ -51,7 +51,11 @@ export default {
       try {
         await apiFetch(`/users/${id}`, {
           method: 'PUT',
-          body: this.form
+          body: JSON.stringify(this.form),
+			headers: {
+			  'Content-Type': 'application/json'
+			}
+
         });
         this.$router.push('/users');
       } catch (err) {

@@ -57,8 +57,11 @@ class UsersSchema extends Schema implements UserInterface
         return $this->email;
     }
     
-    public static function fromArray(array $data): UsersSchema
+    public static function fromArray(?array $data): ?UsersSchema
     {
+        if(empty($data)){
+            return NULL;
+        }
         $user = new UsersSchema();
         $user->id = $data['id'] ?? 0;
         $user->email = $data['email'] ?? '';
