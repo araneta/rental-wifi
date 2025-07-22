@@ -9,7 +9,7 @@ namespace App\Controller;
 
 use App\Model\MassTagihanEntryForm;
 use App\Model\TagihanEntryForm;
-use App\Schemas\PaketSchema;
+use App\Model\TagihanUpdateForm;
 use App\Schemas\PelangganSchema;
 use App\Schemas\TagihanSchema;
 use App\Schemas\UsersSchema;
@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Flex\Response;
 /**
  * Description of TagihanController
  *
@@ -119,6 +118,45 @@ class TagihanController extends AbstractController {
             ResponseHeaderBag::DISPOSITION_ATTACHMENT
         );
     }
+    
+    #[Route('/tagihans/{id}', name: 'get_paket', methods: ['GET'])]
+    public function get(Request $request, TokenStorageInterface $tokenStorage,  int $id): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $paket = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+         $tagihans = $db->select(TagihanSchema::class)
+            ->select([
+                'tagihan.*',
+                'pelanggan.nama AS pelanggan',
+                'users.name AS petugas',
+            ])
+            ->join(
+                PelangganSchema::getTableName(),   // 'pelanggan'
+                PelangganSchema::class,
+                'tagihan.pelanggan_id',
+                '=',
+                'pelanggan.id'
+            )
+            ->leftJoin(
+                UsersSchema::getTableName(),   // 'users'
+                UsersSchema::class,
+                'tagihan.petugas_id',
+                '=',
+                'users.id'
+            )
+            ->where('tagihan.id', '=', $id)
+                ->first();
+
+        return $this->json([
+                    'tagihan' => $tagihans,
+        ]);
+    }
 
     #[Route('/tagihans', name: 'all_tagihans', methods: ['GET'])]
     public function all(Request $request, TokenStorageInterface $tokenStorage): JsonResponse {
@@ -129,7 +167,7 @@ class TagihanController extends AbstractController {
         $status = $request->query->get('status');
         $bulan_tahun = $request->query->get('bulan_tahun');
         
-        $paket = $token->getUser();
+        $tagihan = $token->getUser();
 
         $db = $this->drizzleService->getDb();
 
@@ -175,6 +213,7 @@ class TagihanController extends AbstractController {
         ]);
     }
     
+    
     #[Route('/tagihans/mass', name: 'create_mass_tagihan', methods: ['POST'])]
     public function createMass(#[MapRequestPayload] MassTagihanEntryForm $newTagihan): JsonResponse {
         $db = $this->drizzleService->getDb();
@@ -184,15 +223,15 @@ class TagihanController extends AbstractController {
             'pelanggan.id',
             'pelanggan.nama',
             'pelanggan.no_hp',
-            'paket.nama AS paket_nama',
-            'paket.harga AS paket_harga',
+            'tagihan.nama AS tagihan_nama',
+            'tagihan.harga AS tagihan_harga',
         ])
         ->leftJoin(
-            PaketSchema::getTableName(),   // 'paket'
-            PaketSchema::class,
-            'pelanggan.paket_id',
+            TagihanSchema::getTableName(),   // 'tagihan'
+            TagihanSchema::class,
+            'pelanggan.tagihan_id',
             '=',
-            'paket.id'
+            'tagihan.id'
         )
         ->where('pelanggan.status', '=', 'aktif')
         ->get();
@@ -211,7 +250,7 @@ class TagihanController extends AbstractController {
                             ->values([
                                 'pelanggan_id' => $pelanggan['id'],
                                 'bulan_tahun' => $newTagihan->bulan_tahun,
-                                'jumlah' => $pelanggan['paket_harga'],
+                                'jumlah' => $pelanggan['tagihan_harga'],
                                 'status' => 'belum bayar',
                                 //'tanggal_bayar' => $newTagihan->tanggal_bayar,
                                 //'metode_pembayaran' => '',
@@ -268,5 +307,62 @@ class TagihanController extends AbstractController {
 
         //$token = $this->jwtService->createToken(PelangganSchema::fromArray($pelanggan));
         return $this->json(['success' => $ret, 'tagihan'=>$newTagihan]);
+    }
+    
+    #[Route('/tagihans/{id}', name: 'update_tagihan', methods: ['PUT'])]
+    public function update(Request $request, TokenStorageInterface $tokenStorage,  int $id, #[MapRequestPayload] TagihanUpdateForm $existingTagihan): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $tagihan = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+        $tagihanArr1 = $db->select(TagihanSchema::class)
+                ->where('id', '=', $id)
+                ->first();
+        
+        if (!$tagihanArr1) {
+            return $this->json(['error' => 'Tagihan does not exist'], 404);
+        }
+        $tagihan1 = TagihanSchema::fromArray($tagihanArr1);
+        
+        
+        // Update with validation
+        $ret = $db->update(TagihanSchema::class)
+        ->set(['status'=>$existingTagihan->status,'tanggal_bayar'=>$existingTagihan->tanggal_bayar,'metode_pembayaran'=>$existingTagihan->metode_pembayaran])                
+         ->where('id','=',$id)
+         ->execute();
+        return $this->json([
+                    'status' => $ret,
+        ]);
+    }
+    
+    #[Route('/tagihans/{id}', name: 'delete_tagihan', methods: ['DELETE'])]
+    public function delete(Request $request, TokenStorageInterface $tokenStorage,  int $id): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $paket = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+        $paketArr1 = $db->select(TagihanSchema::class)
+                ->where('id', '=', $id)
+                ->first();
+        
+        if (!$paketArr1) {
+            return $this->json(['error' => 'Tagihan does not exist'], 404);
+        }
+        $ret = $db->delete(TagihanSchema::class)
+        ->where('id','=',$id)
+        ->execute();
+        return $this->json([
+                    'status' => $ret,
+        ]);
     }
 }

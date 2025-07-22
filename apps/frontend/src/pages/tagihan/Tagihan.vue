@@ -47,8 +47,8 @@
             <td>{{ tagihan.bulan_tahun }}</td>
             <td>{{ tagihan.petugas }}</td>
             <td>
-              <button class="btn btn-warning">Edit</button>&nbsp;
-              <button class="btn btn-danger">Hapus</button>
+              <a class="btn btn-warning" :href="`/tagihans/${tagihan.id}`">Edit</a>&nbsp;
+              <button class="btn btn-danger" @click="deleteTagihan(tagihan)">Hapus</button>
             </td>
           </tr>
         </tbody>
@@ -125,7 +125,20 @@ export default {
 		  console.error(err);
 		  toast.error('Gagal mengunduh file Excel.');
 		}
-	  }
+	  },
+	  async deleteTagihan(tagihan) {
+		  const confirmed = confirm(`Yakin ingin menghapus tagihan "${tagihan.pelanggan}"?`);
+		  if (!confirmed) return;
+
+		  try {
+			await apiFetch(`/tagihans/${tagihan.id}`, { method: 'DELETE' });
+			this.tagihans = this.tagihans.filter(p => p.id !== tagihan.id);
+			toast.success(`tagihan "${tagihan.nama}" berhasil dihapus.`);
+		  } catch (err) {
+			console.error(err);
+			toast.error('Gagal menghapus tagihan.');
+		  }
+		}
 	}
 
   
