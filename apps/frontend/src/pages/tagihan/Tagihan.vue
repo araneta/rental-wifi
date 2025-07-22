@@ -9,6 +9,7 @@
           <select v-model="filterStatus" class="form-control">
             <option value="">-- Semua --</option>
             <option value="belum bayar">Belum Bayar</option>
+            <option value="dibayar">Lunas</option>
           </select>
         </div>
         <div class="col-md-3">
@@ -18,8 +19,8 @@
       </div>
     </form>
     <!-- Tombol Tambah -->
-    <button class="btn btn-primary mb-3">Tambah Manual</button>&nbsp;
-    <button class="btn btn-warning mb-3">Tambah Keseluruhan</button>&nbsp;
+    <a class="btn btn-primary mb-3" href="/tagihans/create">Tambah Manual</a>&nbsp;
+    <a class="btn btn-warning mb-3" href="/tagihans/create-mass">Tambah Keseluruhan</a>&nbsp;
     <button class="btn btn-success mb-3">Export Excel</button>&nbsp;
     <div class="table-responsive">
       <table class="table table-bordered" width="100%">
@@ -46,7 +47,7 @@
             <td>{{ tagihan.bulan_tahun }}</td>
             <td>{{ tagihan.petugas }}</td>
             <td>
-              <button class="btn btn-warning">Edit</button>
+              <button class="btn btn-warning">Edit</button>&nbsp;
               <button class="btn btn-danger">Hapus</button>
             </td>
           </tr>

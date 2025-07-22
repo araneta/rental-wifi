@@ -27,7 +27,7 @@ class TagihanSchema extends Schema
     public string $status;
 
     #[Column('tanggal_bayar', 'date', nullable: true)]
-    public ?string $tanggalBayar;
+    public ?string $tanggal_bayar;
 
     #[Column('metode_pembayaran', 'string', nullable: true)]
     public ?string $metode_pembayaran;

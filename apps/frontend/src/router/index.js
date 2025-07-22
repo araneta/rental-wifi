@@ -17,6 +17,8 @@ import CreatePelanggan from '../pages/pelanggan/CreatePelanggan.vue';
 import UpdatePelanggan from '../pages/pelanggan/UpdatePelanggan.vue';
 
 import Tagihan from '../pages/tagihan/Tagihan.vue';
+import CreateTagihan from '../pages/tagihan/CreateTagihan.vue';
+import MassCreateTagihan from '../pages/tagihan/MassCreateTagihan.vue';
 
 import Pembayaran from '../pages/Pembayaran.vue';
 import Rekap from '../pages/Rekap.vue';
@@ -39,6 +41,8 @@ const routes = [
   {path:'/pelanggans/:id', component: UpdatePelanggan, meta:{requiredAuth: true}},
   
   { path: '/tagihans', component: Tagihan, meta: { requiresAuth: true } },
+  {path:'/tagihans/create', component: CreateTagihan, meta:{requiredAuth: true}},
+  {path:'/tagihans/create-mass', component: MassCreateTagihan, meta:{requiredAuth: true}},
   
   
   { path: '/pembayaran', component: Pembayaran, meta: { requiresAuth: true } },

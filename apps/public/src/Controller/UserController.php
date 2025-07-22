@@ -80,14 +80,17 @@ final class UserController extends AbstractController {
         }
 
         $user = $token->getUser();
-
+        $role = $request->query->get('role');
         $db = $this->drizzleService->getDb();
 
-        $users = $db->select(UsersSchema::class)
-                ->get();
+        $users = $db->select(UsersSchema::class);
+        if (!empty($role)) {
+            $users->where('role', '=', $role);
+        }
+        $result = $users->get();
 
         return $this->json([
-                    'users' => $users,
+                    'users' => $result,
         ]);
     }
     

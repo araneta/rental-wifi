@@ -32,6 +32,39 @@ class PelangganController extends AbstractController {
         
     }
     
+    #[Route('/pelanggans/aktif', name: 'all_pelanggans_aktif', methods: ['GET'])]
+    public function allAktif(Request $request, TokenStorageInterface $tokenStorage): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $pelanggan = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+        $pelanggans = $db->select(PelangganSchema::class)
+        ->select([
+            'pelanggan.id',
+            'pelanggan.nama',
+            'pelanggan.no_hp',
+            'paket.nama AS paket_nama',
+            'paket.harga AS paket_harga',
+        ])
+        ->leftJoin(
+            PaketSchema::getTableName(),   // 'paket'
+            PaketSchema::class,
+            'pelanggan.paket_id',
+            '=',
+            'paket.id'
+        )
+        ->where('pelanggan.status', '=', 'aktif')
+        ->get();
+        return $this->json([
+                    'pelanggans' => $pelanggans,
+        ]);
+    }
+    
     #[Route('/pelanggans', name: 'all_pelanggans', methods: ['GET'])]
     public function all(Request $request, TokenStorageInterface $tokenStorage): JsonResponse {
         $token = $tokenStorage->getToken();
