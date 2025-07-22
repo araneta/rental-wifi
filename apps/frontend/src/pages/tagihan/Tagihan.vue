@@ -21,7 +21,7 @@
     <!-- Tombol Tambah -->
     <a class="btn btn-primary mb-3" href="/tagihans/create">Tambah Manual</a>&nbsp;
     <a class="btn btn-warning mb-3" href="/tagihans/create-mass">Tambah Keseluruhan</a>&nbsp;
-    <button class="btn btn-success mb-3">Export Excel</button>&nbsp;
+    <button class="btn btn-success mb-3" @click="downloadExcel">Export Excel</button>&nbsp;
     <div class="table-responsive">
       <table class="table table-bordered" width="100%">
         <thead>
@@ -90,7 +90,44 @@ export default {
       console.error('Fetch failed', e);
       toast.error('Gagal memuat data tagihan.');
     }
-  }
+  },
+  methods: {
+	  async downloadExcel() {
+		try {
+		  const token = localStorage.getItem('token');
+
+		  const response = await fetch(
+			`http://localhost:8080/api/tagihans/excel?status=${encodeURIComponent(this.filterStatus)}&bulan_tahun=${encodeURIComponent(this.filterBulanTahun)}`,
+			{
+			  method: 'GET',
+			  headers: {
+				'Authorization': token ? `Bearer ${token}` : '',
+			  }
+			}
+		  );
+
+		  if (!response.ok) {
+			throw new Error('Download failed');
+		  }
+
+		  const blob = await response.blob();
+		  const url = window.URL.createObjectURL(blob);
+		  const link = document.createElement('a');
+		  link.href = url;
+		  link.download = `tagihan-${this.filterBulanTahun || 'semua'}.xlsx`;
+		  document.body.appendChild(link);
+		  link.click();
+		  document.body.removeChild(link);
+		  window.URL.revokeObjectURL(url);
+
+		  toast.success('File berhasil diunduh.');
+		} catch (err) {
+		  console.error(err);
+		  toast.error('Gagal mengunduh file Excel.');
+		}
+	  }
+	}
+
   
 }
 </script>

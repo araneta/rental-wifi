@@ -14,13 +14,17 @@ use App\Schemas\PelangganSchema;
 use App\Schemas\TagihanSchema;
 use App\Schemas\UsersSchema;
 use App\Service\DrizzleService;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use function Webmozart\Assert\Tests\StaticAnalysis\count;
+use Symfony\Flex\Response;
 /**
  * Description of TagihanController
  *
@@ -36,6 +40,86 @@ class TagihanController extends AbstractController {
         
     }
     
+    
+   #[Route('/tagihans/excel', name: 'excel_tagihans', methods: ['GET'])]
+    public function excel(Request $request, TokenStorageInterface $tokenStorage): BinaryFileResponse
+    {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $status = $request->query->get('status');
+        $bulan_tahun = $request->query->get('bulan_tahun');
+
+        $db = $this->drizzleService->getDb();
+        $tagihans = $db->select(TagihanSchema::class)
+            ->select([
+                'tagihan.*',
+                'pelanggan.nama AS pelanggan',
+                'users.name AS petugas',
+            ])
+            ->join(
+                PelangganSchema::getTableName(),
+                PelangganSchema::class,
+                'tagihan.pelanggan_id',
+                '=',
+                'pelanggan.id'
+            )
+            ->leftJoin(
+                UsersSchema::getTableName(),
+                UsersSchema::class,
+                'tagihan.petugas_id',
+                '=',
+                'users.id'
+            );
+
+        if (!empty($status)) {
+            $tagihans->where('tagihan.status', '=', $status);
+        }
+
+        if (!empty($bulan_tahun)) {
+            $tagihans->where('tagihan.bulan_tahun', '=', $bulan_tahun);
+        }
+
+        $results = $tagihans->orderBy('tagihan.created_at', 'DESC')->get();
+
+        // Generate Excel
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header
+        $sheet->fromArray(['No', 'Pelanggan', 'Jumlah', 'Status', 'Bulan/Tahun', 'Petugas'], null, 'A1');
+
+        // Fill data
+        $row = 2;
+        $no = 1;
+        foreach ($results as $data) {
+            $sheet->setCellValue("A$row", $no);
+            $sheet->setCellValue("B$row", $data['pelanggan']);
+            $sheet->setCellValue("C$row", $data['jumlah']);
+            $sheet->setCellValue("D$row", $data['status'] === 'belum bayar' ? 'Belum Bayar' : 'Lunas');
+            $sheet->setCellValue("E$row", $data['bulan_tahun']);
+            $sheet->setCellValue("F$row", $data['petugas']);
+            $row++;
+            $no++;
+        }
+
+        // Temp file with .xlsx extension
+        $tempFile = tempnam(sys_get_temp_dir(), 'tagihan_');
+        $xlsxFile = $tempFile . '.xlsx'; // PhpSpreadsheet needs .xlsx extension
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($xlsxFile); // Save full .xlsx file
+
+        // Return file response
+        return $this->file(
+            $xlsxFile,
+            'tagihan-semua.xlsx',
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT
+        );
+    }
+
     #[Route('/tagihans', name: 'all_tagihans', methods: ['GET'])]
     public function all(Request $request, TokenStorageInterface $tokenStorage): JsonResponse {
         $token = $tokenStorage->getToken();
