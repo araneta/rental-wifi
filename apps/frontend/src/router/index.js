@@ -21,7 +21,10 @@ import CreateTagihan from '../pages/tagihan/CreateTagihan.vue';
 import MassCreateTagihan from '../pages/tagihan/MassCreateTagihan.vue';
 import TagihanEdit from '../pages/tagihan/TagihanEdit.vue';
 
-import Pembayaran from '../pages/Pembayaran.vue';
+import Pembayaran from '../pages/pembayaran/Pembayaran.vue';
+import CreatePembayaran from '../pages/pembayaran/CreatePembayaran.vue';
+import UpdatePembayaran from '../pages/pembayaran/UpdatePembayaran.vue';
+
 import Rekap from '../pages/Rekap.vue';
 
 const routes = [
@@ -47,7 +50,10 @@ const routes = [
   { path: '/tagihans/:id', component: TagihanEdit, meta: { requiresAuth: true } },
   
   
-  { path: '/pembayaran', component: Pembayaran, meta: { requiresAuth: true } },
+  { path: '/pembayarans', component: Pembayaran, meta: { requiresAuth: true } },
+  {path:'/pembayarans/create', component: CreatePembayaran, meta:{requiredAuth: true}},
+  { path: '/pembayarans/:id', component: UpdatePembayaran, meta: { requiresAuth: true } },
+  
   { path: '/rekap', component: Rekap, meta: { requiresAuth: true } },
   { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true } }
 ];

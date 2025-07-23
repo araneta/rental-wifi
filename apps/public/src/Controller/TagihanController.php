@@ -277,6 +277,26 @@ class TagihanController extends AbstractController {
         
     }
     
+    #[Route('/tagihans/by-pelanggan/{pelanggan_id}', name: 'get_tagihan_pelanggan', methods: ['get'])]
+    public function getTagihanPelanggan(Request $request, TokenStorageInterface $tokenStorage,  int $pelanggan_id): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $paket = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+        $tagihanList = $db->select(TagihanSchema::class)
+        ->select(['id', 'bulan_tahun', 'jumlah'])
+        ->where('pelanggan_id', '=', $pelanggan_id)
+        ->whereIn('status', ['belum bayar', ''])
+        ->get();
+
+        return $this->json(['success' => 1, 'tagihans'=>$tagihanList]);
+    }
+    
     #[Route('/tagihans', name: 'create_tagihan', methods: ['POST'])]
     public function create(#[MapRequestPayload] TagihanEntryForm $newTagihan): JsonResponse {
         $db = $this->drizzleService->getDb();
@@ -329,10 +349,13 @@ class TagihanController extends AbstractController {
         }
         $tagihan1 = TagihanSchema::fromArray($tagihanArr1);
         
-        
+        $newdata = ['status'=>$existingTagihan->status,'metode_pembayaran'=>$existingTagihan->metode_pembayaran];
+        if(!empty($existingTagihan->tanggal_bayar)){
+            $newdata['tanggal_bayar'] = $existingTagihan->tanggal_bayar;
+        }
         // Update with validation
         $ret = $db->update(TagihanSchema::class)
-        ->set(['status'=>$existingTagihan->status,'tanggal_bayar'=>$existingTagihan->tanggal_bayar,'metode_pembayaran'=>$existingTagihan->metode_pembayaran])                
+        ->set($newdata)                
          ->where('id','=',$id)
          ->execute();
         return $this->json([

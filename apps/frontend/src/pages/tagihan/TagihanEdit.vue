@@ -64,6 +64,9 @@ export default {
   methods: {
     async updateTagihan() {
       try {
+		if(this.form.tanggal_bayar==null){
+			this.form.tanggal_bayar = '';
+		}
         await apiFetch(`/tagihans/${this.tagihanId}`, {
           method: 'PUT',
           body: JSON.stringify(this.form)

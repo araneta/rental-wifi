@@ -60,7 +60,7 @@ async function handleFetch(fullUrl, options = {}, redirectOnFail = false) {
         '- CORS is not allowed\n\n' +
         'Check your server or try again later.'
       );
-     // window.location.href = '/login';
+     window.location.href = '/login';
     } else {
       //toast.error(
         //`Unexpected error: ${err.message || 'Unknown error occurred.'}`

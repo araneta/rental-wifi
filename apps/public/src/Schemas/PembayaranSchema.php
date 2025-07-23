@@ -15,33 +15,33 @@ class PembayaranSchema extends Schema
     public int $id;
 
     #[Column('tagihan_id', 'int')]
-    public int $tagihanId;
+    public int $tagihan_id;
 
     #[Column('pelanggan_id', 'int')]
-    public int $pelangganId;
+    public int $pelanggan_id;
 
     #[Column('petugas_id', 'int', nullable: true)]
-    public ?int $petugasId;
+    public ?int $petugas_id;
 
     #[Column('jumlah', 'float')]
     public float $jumlah;
 
     #[Column('metode_pembayaran', 'string')]
-    public string $metodePembayaran;
+    public string $metode_pembayaran;
 
     #[Column('tanggal_pembayaran', 'datetime')]
-    public string $tanggalPembayaran;
+    public string $tanggal_pembayaran;
 
     public static function fromArray(array $data): PembayaranSchema
     {
         $pembayaran = new PembayaranSchema();
         $pembayaran->id = $data['id'] ?? 0;
-        $pembayaran->tagihanId = $data['tagihan_id'] ?? 0;
-        $pembayaran->pelangganId = $data['pelanggan_id'] ?? 0;
-        $pembayaran->petugasId = $data['petugas_id'] ?? null;
+        $pembayaran->tagihan_id = $data['tagihan_id'] ?? 0;
+        $pembayaran->pelanggan_id = $data['pelanggan_id'] ?? 0;
+        $pembayaran->petugas_id = $data['petugas_id'] ?? null;
         $pembayaran->jumlah = (float)($data['jumlah'] ?? 0);
-        $pembayaran->metodePembayaran = $data['metode_pembayaran'] ?? '';
-        $pembayaran->tanggalPembayaran = $data['tanggal_pembayaran'] ?? '';
+        $pembayaran->metode_pembayaran = $data['metode_pembayaran'] ?? '';
+        $pembayaran->tanggal_pembayaran = $data['tanggal_pembayaran'] ?? '';
 
         return $pembayaran;
     }
