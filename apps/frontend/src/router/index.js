@@ -25,7 +25,7 @@ import Pembayaran from '../pages/pembayaran/Pembayaran.vue';
 import CreatePembayaran from '../pages/pembayaran/CreatePembayaran.vue';
 import UpdatePembayaran from '../pages/pembayaran/UpdatePembayaran.vue';
 
-import Rekap from '../pages/Rekap.vue';
+import Rekap from '../pages/rekap/Rekap.vue';
 
 const routes = [
 	{ path: '/', component: Home },
@@ -54,7 +54,7 @@ const routes = [
   {path:'/pembayarans/create', component: CreatePembayaran, meta:{requiredAuth: true}},
   { path: '/pembayarans/:id', component: UpdatePembayaran, meta: { requiresAuth: true } },
   
-  { path: '/rekap', component: Rekap, meta: { requiresAuth: true } },
+  { path: '/rekaps', component: Rekap, meta: { requiresAuth: true } },
   { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true } }
 ];
 
