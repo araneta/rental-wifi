@@ -1,0 +1,20 @@
+{
+  "index.html": {
+    "file": "index-DK9x3QyO.js",
+    "name": "index",
+    "src": "index.html",
+    "isEntry": true,
+    "imports": [
+      "src/main.js"
+    ]
+  },
+  "src/main.js": {
+    "file": "main-C6549el2.js",
+    "name": "main",
+    "src": "src/main.js",
+    "isEntry": true,
+    "css": [
+      "main-DnojJsHo.css"
+    ]
+  }
+}

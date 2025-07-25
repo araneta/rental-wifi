@@ -5,12 +5,14 @@ import path from 'path';
 export default defineConfig({
   plugins: [vue()],
   build: {
-    outDir: path.resolve(__dirname, '../public/assets'),
+	  outDir: 'dist', // Output directory for production build
+    
     emptyOutDir: true,
     manifest: true,
+    
     assetsDir: '.',
     rollupOptions: {
-      input: './src/main.js'
+       input: ['src/main.js', './index.html']
     }
   }
 });

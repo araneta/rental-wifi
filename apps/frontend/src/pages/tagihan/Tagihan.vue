@@ -21,7 +21,7 @@
     <!-- Tombol Tambah -->
     <a class="btn btn-primary mb-3" href="/tagihans/create">Tambah Manual</a>&nbsp;
     <a class="btn btn-warning mb-3" href="/tagihans/create-mass">Tambah Keseluruhan</a>&nbsp;
-    <button class="btn btn-success mb-3" @click="downloadExcel">Export Excel</button>&nbsp;
+    <button class="btn btn-success mb-3" @click="btndownloadExcel">Export Excel</button>&nbsp;
     <div class="table-responsive">
       <table class="table table-bordered" width="100%">
         <thead>
@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { apiFetch } from '../../api' // Your custom API handler
+import { apiFetch, downloadExcel } from '../../api' // Your custom API handler
 import { useToast } from 'vue-toastification';
 const toast = useToast();
 
@@ -92,39 +92,8 @@ export default {
     }
   },
   methods: {
-	  async downloadExcel() {
-		try {
-		  const token = localStorage.getItem('token');
-
-		  const response = await fetch(
-			`http://localhost:8080/api/tagihans/excel?status=${encodeURIComponent(this.filterStatus)}&bulan_tahun=${encodeURIComponent(this.filterBulanTahun)}`,
-			{
-			  method: 'GET',
-			  headers: {
-				'Authorization': token ? `Bearer ${token}` : '',
-			  }
-			}
-		  );
-
-		  if (!response.ok) {
-			throw new Error('Download failed');
-		  }
-
-		  const blob = await response.blob();
-		  const url = window.URL.createObjectURL(blob);
-		  const link = document.createElement('a');
-		  link.href = url;
-		  link.download = `tagihan-${this.filterBulanTahun || 'semua'}.xlsx`;
-		  document.body.appendChild(link);
-		  link.click();
-		  document.body.removeChild(link);
-		  window.URL.revokeObjectURL(url);
-
-		  toast.success('File berhasil diunduh.');
-		} catch (err) {
-		  console.error(err);
-		  toast.error('Gagal mengunduh file Excel.');
-		}
+	  async btndownloadExcel() {
+		downloadExcel(`/tagihans/excel?status=${encodeURIComponent(this.filterStatus)}&bulan_tahun=${encodeURIComponent(this.filterBulanTahun)}`, `tagihan-${this.filterBulanTahun || 'semua'}`);		
 	  },
 	  async deleteTagihan(tagihan) {
 		  const confirmed = confirm(`Yakin ingin menghapus tagihan "${tagihan.pelanggan}"?`);

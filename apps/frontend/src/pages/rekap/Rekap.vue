@@ -9,7 +9,19 @@
         <option value="minggu">Mingguan</option>
         <option value="bulan">Bulanan</option>
         <option value="tahun">Tahunan</option>
+        <option value="range">Rentang Tanggal</option>
       </select>
+    </div>
+
+    <div v-if="filter === 'range'" class="row mb-3">
+      <div class="col-md-5">
+        <label for="start" class="form-label">Tanggal Mulai:</label>
+        <input type="date" v-model="startDate" class="form-control" @change="fetchData">
+      </div>
+      <div class="col-md-5">
+        <label for="end" class="form-label">Tanggal Akhir:</label>
+        <input type="date" v-model="endDate" class="form-control" @change="fetchData">
+      </div>
     </div>
 
     <table class="table table-bordered mt-3" v-if="data.length">
@@ -37,25 +49,21 @@
 
     <div v-else class="text-muted">Tidak ada data.</div>
 
-    <a
-      :href="`/export_excel.php?filter=${filter}`"
-      class="btn btn-success mt-3"
-      target="_blank"
-    >
-      Export ke Excel
-    </a>
+    <button class="btn btn-success mb-3" @click="btndownloadExcel">Export Excel</button>
   </div>
 </template>
 
 <script>
-import { apiFetch } from '../../api'
+import { apiFetch, downloadExcel } from '../../api'
 
 export default {
   name: 'RekapPembayaran',
   data() {
     return {
       filter: 'hari',
-      data: []
+      data: [],
+      startDate: '',
+      endDate: ''
     }
   },
   mounted() {
@@ -64,7 +72,18 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const res = await apiFetch(`/rekaps?filter=${this.filter}`)
+        let url = `/rekaps?filter=${this.filter}`
+
+        if (this.filter === 'range') {
+          if (this.startDate && this.endDate) {
+            url += `&start=${this.startDate}&end=${this.endDate}`
+          } else {
+            this.data = []
+            return
+          }
+        }
+
+        const res = await apiFetch(url)
         this.data = res.pembayarans || []
       } catch (err) {
         console.error('Gagal mengambil data rekap', err)
@@ -77,6 +96,21 @@ export default {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       })
+    },
+    async btndownloadExcel() {
+		if(!this.startDate){
+			alert('Pilih tanggal mulai');
+			return;
+		}
+		if(!this.endDate){
+			alert('Pilih tanggal akhir');
+			return;
+		}
+      let url = `/rekaps/excel?filter=${encodeURIComponent(this.filter)}`
+      if (this.filter === 'range' && this.startDate && this.endDate) {
+        url += `&start=${this.startDate}&end=${this.endDate}`
+      }
+      downloadExcel(url, 'rekap_pembayaran')
     }
   }
 }

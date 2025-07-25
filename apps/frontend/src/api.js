@@ -1,8 +1,9 @@
 import { useToast } from 'vue-toastification';
 const toast = useToast();
 
-const base_api_url = 'http://localhost:8080/api';
-const base_auth_url = 'http://localhost:8080/auth';
+const base_api_url = import.meta.env.VITE_API_BASE_URL;
+const base_auth_url = import.meta.env.VITE_AUTH_BASE_URL;
+
 
 /**
  * Utility to perform fetch with error handling and token support
@@ -77,4 +78,41 @@ export async function authFetch(url, options = {}) {
 
 export async function apiFetch(url, options = {}) {
   return handleFetch(base_api_url + url, options, true);
+}
+
+export async function downloadExcel(url, name){
+	console.log('url',url);
+	const urlx = base_api_url + url;
+	try {
+	  const token = localStorage.getItem('token');
+
+	  const response = await fetch(
+		urlx,
+		{
+		  method: 'GET',
+		  headers: {
+			'Authorization': token ? `Bearer ${token}` : '',
+		  }
+		}
+	  );
+
+	  if (!response.ok) {
+		throw new Error('Download failed');
+	  }
+
+	  const blob = await response.blob();
+	  const url = window.URL.createObjectURL(blob);
+	  const link = document.createElement('a');
+	  link.href = url;
+	  link.download = name+'.xlsx';
+	  document.body.appendChild(link);
+	  link.click();
+	  document.body.removeChild(link);
+	  window.URL.revokeObjectURL(url);
+
+	  toast.success('File berhasil diunduh.');
+	} catch (err) {
+	  console.error(err);
+	  toast.error('Gagal mengunduh file Excel.');
+	}
 }
