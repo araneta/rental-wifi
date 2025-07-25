@@ -23,7 +23,7 @@ import { authFetch } from '../api';
 
 export default {
   data() {
-    return { form: { email: 'agilsuhanda515@gmail.com', password: 'willamette' }, error: '' };
+    return { form: { email: '', password: '' }, error: '' };
   },
   methods: {
     async login() {

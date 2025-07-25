@@ -22,8 +22,11 @@ async function handleFetch(fullUrl, options = {}, redirectOnFail = false) {
 
     if (res.status === 401) {
       localStorage.clear();
-      toast.error('Session expired — please log in again.');
-      window.location.href = '/login';
+      
+      if(fullUrl.indexOf('/login')==1){
+		  toast.error('Session expired — please log in again.');
+		window.location.href = '/login';
+	  }
       return;
     }
 
