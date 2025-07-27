@@ -1,6 +1,7 @@
 <template>
   <div>
     <h2>Daftar Tagihan</h2>
+
     <!-- Form Filter -->
     <form class="mb-3" @submit.prevent>
       <div class="row">
@@ -16,12 +17,19 @@
           <label>Bulan/Tahun:</label>
           <input type="month" v-model="filterBulanTahun" class="form-control" />
         </div>
+        <div class="col-md-3">
+          <label>Cari Pelanggan:</label>
+          <input type="text" v-model="searchKeyword" class="form-control" placeholder="Nama pelanggan..." />
+        </div>
       </div>
     </form>
+
     <!-- Tombol Tambah -->
     <a class="btn btn-primary mb-3" href="/tagihans/create">Tambah Manual</a>&nbsp;
     <a class="btn btn-warning mb-3" href="/tagihans/create-mass">Tambah Keseluruhan</a>&nbsp;
     <button class="btn btn-success mb-3" @click="btndownloadExcel">Export Excel</button>&nbsp;
+
+    <!-- Table -->
     <div class="table-responsive">
       <table class="table table-bordered" width="100%">
         <thead>
@@ -47,6 +55,7 @@
             <td>{{ tagihan.bulan_tahun }}</td>
             <td>{{ tagihan.petugas }}</td>
             <td>
+              <button class="btn btn-success" @click="bayarTagihan(tagihan)">Bayar</button>&nbsp;
               <a class="btn btn-warning" :href="`/tagihans/${tagihan.id}`">Edit</a>&nbsp;
               <button class="btn btn-danger" @click="deleteTagihan(tagihan)">Hapus</button>
             </td>
@@ -58,7 +67,7 @@
 </template>
 
 <script>
-import { apiFetch, downloadExcel } from '../../api' // Your custom API handler
+import { apiFetch, downloadExcel } from '../../api';
 import { useToast } from 'vue-toastification';
 const toast = useToast();
 
@@ -68,9 +77,8 @@ export default {
     return {
       filterStatus: '',
       filterBulanTahun: '',
-      tagihans: [
-        
-      ]
+      searchKeyword: '',
+      tagihans: []
     }
   },
   computed: {
@@ -78,13 +86,14 @@ export default {
       return this.tagihans.filter(t => {
         const statusMatch = !this.filterStatus || t.status === this.filterStatus;
         const bulanTahunMatch = !this.filterBulanTahun || t.bulan_tahun === this.filterBulanTahun;
-        return statusMatch && bulanTahunMatch;
+        const keywordMatch = !this.searchKeyword || t.pelanggan.toLowerCase().includes(this.searchKeyword.toLowerCase());
+        return statusMatch && bulanTahunMatch && keywordMatch;
       });
     }
   },
   async mounted() {
     try {
-      const data = await apiFetch('/tagihans?status='+this.filterStatus, { method: 'GET' });
+      const data = await apiFetch('/tagihans?status=' + this.filterStatus, { method: 'GET' });
       this.tagihans = data.tagihans;
     } catch (e) {
       console.error('Fetch failed', e);
@@ -92,27 +101,41 @@ export default {
     }
   },
   methods: {
-	  async btndownloadExcel() {
-		downloadExcel(`/tagihans/excel?status=${encodeURIComponent(this.filterStatus)}&bulan_tahun=${encodeURIComponent(this.filterBulanTahun)}`, `tagihan-${this.filterBulanTahun || 'semua'}`);		
-	  },
-	  async deleteTagihan(tagihan) {
-		  const confirmed = confirm(`Yakin ingin menghapus tagihan "${tagihan.pelanggan}"?`);
-		  if (!confirmed) return;
+    async btndownloadExcel() {
+      downloadExcel(
+        `/tagihans/excel?status=${encodeURIComponent(this.filterStatus)}&bulan_tahun=${encodeURIComponent(this.filterBulanTahun)}`,
+        `tagihan-${this.filterBulanTahun || 'semua'}`
+      );
+    },
+    async deleteTagihan(tagihan) {
+      const confirmed = confirm(`Yakin ingin menghapus tagihan "${tagihan.pelanggan}"?`);
+      if (!confirmed) return;
 
-		  try {
-			await apiFetch(`/tagihans/${tagihan.id}`, { method: 'DELETE' });
-			this.tagihans = this.tagihans.filter(p => p.id !== tagihan.id);
-			toast.success(`tagihan "${tagihan.nama}" berhasil dihapus.`);
-		  } catch (err) {
-			console.error(err);
-			toast.error('Gagal menghapus tagihan.');
-		  }
-		}
-	}
+      try {
+        await apiFetch(`/tagihans/${tagihan.id}`, { method: 'DELETE' });
+        this.tagihans = this.tagihans.filter(p => p.id !== tagihan.id);
+        toast.success(`Tagihan "${tagihan.pelanggan}" berhasil dihapus.`);
+      } catch (err) {
+        console.error(err);
+        toast.error('Gagal menghapus tagihan.');
+      }
+    },
+    async bayarTagihan(tagihan) {
+		window.location.href = '/pembayarans/create?tagihan_id='+tagihan.id;
+		return;
+      try {
+        const confirmed = confirm(`Tandai tagihan "${tagihan.pelanggan}" sebagai LUNAS?`);
+        if (!confirmed) return;
 
-  
+        const data = await apiFetch(`/tagihans/${tagihan.id}/bayar`, { method: 'POST' });
+        console.log('data',data);
+        tagihan.status = 'dibayar';
+        toast.success(`Tagihan "${tagihan.pelanggan}" berhasil ditandai sebagai lunas.`);
+      } catch (err) {
+        console.error(err);
+        toast.error('Gagal membayar tagihan.');
+      }
+    }
+  }
 }
 </script>
-
-<style scoped>
-</style> 

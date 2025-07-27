@@ -25,8 +25,8 @@ class PembayaranEntryForm {
             #[Assert\Positive]
             public int $pelanggan_id,
             
-            #[Assert\Positive]
-            public int $petugas_id,
+            //#[Assert\Positive]
+            //public int $petugas_id,
             
             
             #[Assert\NotBlank]

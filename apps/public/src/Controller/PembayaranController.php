@@ -102,7 +102,14 @@ class PembayaranController extends AbstractController {
     }
     
     #[Route('/pembayarans', name: 'create_pembayaran', methods: ['POST'])]
-    public function create(#[MapRequestPayload] PembayaranEntryForm $newPembayaran): JsonResponse {
+    public function create(Request $request, TokenStorageInterface $tokenStorage, #[MapRequestPayload] PembayaranEntryForm $newPembayaran): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $user = $token->getUser();
+        
         $db = $this->drizzleService->getDb();
 
         $existing = $db->select(PembayaranSchema::class)
@@ -121,7 +128,7 @@ class PembayaranController extends AbstractController {
                     'pelanggan_id' => $newPembayaran->pelanggan_id,
                     'tagihan_id' => $newPembayaran->tagihan_id,
                     'jumlah' => $newPembayaran->jumlah,
-                    'petugas_id' => $newPembayaran->petugas_id,
+                    'petugas_id' => $user->id,
                     'tanggal_pembayaran' => empty($newPembayaran->tanggal_pembayaran) ? NULL : $newPembayaran->tanggal_pembayaran,
                     'metode_pembayaran' => empty($newPembayaran->metode_pembayaran) ? "" : $newPembayaran->metode_pembayaran,                    
                 ])

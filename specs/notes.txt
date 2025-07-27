@@ -10,3 +10,5 @@ curl -X POST http://localhost:8080/auth/login \
   -d '{"email":"agilsuhanda515@gmail.com","password":"515"}'
 
 https://onlinephp.io/password-hash
+kemangic_rentalwifi
+[so0bCkt-S=O5-yq

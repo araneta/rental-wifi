@@ -119,7 +119,7 @@ class TagihanController extends AbstractController {
         );
     }
     
-    #[Route('/tagihans/{id}', name: 'get_paket', methods: ['GET'])]
+    #[Route('/tagihans/{id}', name: 'get_tagihan', methods: ['GET'])]
     public function get(Request $request, TokenStorageInterface $tokenStorage,  int $id): JsonResponse {
         $token = $tokenStorage->getToken();
         if (!$token) {

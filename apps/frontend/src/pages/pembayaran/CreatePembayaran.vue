@@ -75,6 +75,11 @@ export default {
   },
   mounted() {
     this.apiFetchPelanggan()
+    const tagihanIdFromURL = this.$route.query.tagihan_id;
+	if (tagihanIdFromURL) {
+		this.form.tagihan_id = parseInt(tagihanIdFromURL); // or use as-is if it's a string
+		this.apiFetchTagihanByID(tagihanIdFromURL);
+	}
   },
   methods: {
     async apiFetchPelanggan() {
@@ -111,6 +116,7 @@ export default {
     async submitForm() {
 		
       try {
+		this.form.jumlah = parseInt(this.form.jumlah);
         const res = await apiFetch('/pembayarans', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -119,7 +125,8 @@ export default {
 
         this.alertType = 'success'
         this.alertMessage = 'Pembayaran berhasil ditambahkan!'
-        this.resetForm()
+        this.resetForm();
+        window.location.href='/pembayarans/';
         
       } catch (err) {
         this.alertType = 'danger'
@@ -140,7 +147,25 @@ export default {
     },
     formatNumber(n) {
       return Number(n).toLocaleString('id-ID')
-    }
+    },
+    async apiFetchTagihanByID(tagihan_id) {
+	  try {
+		const response = await apiFetch('/tagihans/' + tagihan_id);
+		if (response.tagihan) {
+		  const tagihan = response.tagihan;
+		  this.tagihanList = [tagihan];
+		  this.form.pelanggan_id = tagihan.pelanggan_id;
+		  this.form.jumlah = tagihan.jumlah;
+		} else {
+		  this.alertType = 'danger';
+		  this.alertMessage = 'Tagihan tidak ditemukan.';
+		}
+	  } catch (err) {
+		console.error(err);
+		this.alertType = 'danger';
+		this.alertMessage = 'Gagal memuat tagihan.';
+	  }
+	},
   }
 }
 </script>
