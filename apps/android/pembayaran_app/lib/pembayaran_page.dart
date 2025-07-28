@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'tagihan_page.dart';
+import 'Config.dart';
 
 class PembayaranPage extends StatefulWidget {
   final String? tagihanId;
@@ -52,7 +53,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
     setState(() => isLoading = true);
     try {
       final res = await http.get(
-        Uri.parse('https://rentalwifi.aldoapp.com/api/pelanggans'),
+        Uri.parse(Config.API_HOST+'/api/pelanggans'),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (res.statusCode == 200) {
@@ -84,7 +85,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
     });
     try {
       final res = await http.get(
-        Uri.parse('https://rentalwifi.aldoapp.com/api/tagihans/by-pelanggan/$pelangganId'),
+        Uri.parse(Config.API_HOST+'/api/tagihans/by-pelanggan/$pelangganId'),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (res.statusCode == 200) {
@@ -111,7 +112,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
     setState(() => isLoading = true);
     try {
       final res = await http.get(
-        Uri.parse('https://rentalwifi.aldoapp.com/api/tagihans/$tagihanId'),
+        Uri.parse(Config.API_HOST+'/api/tagihans/$tagihanId'),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (res.statusCode == 200) {
@@ -157,7 +158,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
         'jumlah': int.tryParse(form['jumlah'].toString()) ?? 0,
       };
       final res = await http.post(
-        Uri.parse('https://rentalwifi.aldoapp.com/api/pembayarans'),
+        Uri.parse(Config.API_HOST+'/api/pembayarans'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

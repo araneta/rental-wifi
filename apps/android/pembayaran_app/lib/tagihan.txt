@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'Config.dart';
 import 'login_page.dart';
 import 'pembayaran_page.dart';
-import 'month_picker.dart';
 
 class TagihanItem {
   final String id;
@@ -44,7 +42,6 @@ class _TagihanPageState extends State<TagihanPage> {
   String searchQuery = "";
   String selectedStatus = "semua";
   bool isLoading = false;
-  String filterBulanTahun = '';
 
   final List<String> statusOptions = ["semua", "dibayar", "belum bayar"];
 
@@ -88,17 +85,10 @@ class _TagihanPageState extends State<TagihanPage> {
       setState(() => isLoading = false);
     }
   }
-	List<TagihanItem> get filteredTagihan {
-		return allItems.where((t) {
-		  //final statusMatch = filterStatus == '' || t.status == filterStatus;
-		  final bulanTahunMatch = filterBulanTahun == '' || t.bulanTahun == filterBulanTahun;
-		  final keywordMatch = searchQuery == '' || t.pelanggan.toLowerCase().contains(searchQuery.toLowerCase());
-		  return bulanTahunMatch && keywordMatch;
-		}).toList();
-	  }
+
   @override
   Widget build(BuildContext context) {
-    final filteredItems = filteredTagihan;//allItems.where((item) => item.pelanggan.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+    final filteredItems = allItems.where((item) => item.pelanggan.toLowerCase().contains(searchQuery.toLowerCase())).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -111,7 +101,7 @@ class _TagihanPageState extends State<TagihanPage> {
             DrawerHeader(child: Text('Menu', style: TextStyle(fontSize: 24))),
             ListTile(
               leading: Icon(Icons.payment),
-              title: Text('Tagihan'),
+              title: Text('Pembayaran'),
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
@@ -149,19 +139,6 @@ class _TagihanPageState extends State<TagihanPage> {
                 },
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: MonthPickerField(
-					onChanged: (date) {
-						// Use DateFormat('yyyy-MM').format(date) to filter
-						//print('Selected month: ${DateFormat('yyyy-MM').format(date)}');
-						setState((){
-							filterBulanTahun = DateFormat('yyyy-MM').format(date);
-						});
-					},
-				),
-            ),
-           
             Expanded(
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
@@ -193,7 +170,7 @@ class _TagihanPageState extends State<TagihanPage> {
 											),
 										  );
 										},
-                                      child: Text('BAYAR',  style: TextStyle(color:Colors.white)),
+                                      child: Text('BAYAR'),
                                     )
                                   : null,
                             );
