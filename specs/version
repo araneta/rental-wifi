@@ -1,0 +1,6 @@
+Setting	Value
+AGP version	8.4.1 ✅
+Gradle version	8.6 ✅ (required for AGP 8.4.1)
+Kotlin version	1.9.22 ✅
+Java version	17 ✅
+compileSdkVersion	34 ✅ (safe)

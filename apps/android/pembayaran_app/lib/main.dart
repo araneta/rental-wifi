@@ -1,34 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'login_page.dart';
 import 'tagihan_page.dart';
 
-void main() {
-  runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = 'https://ea98d019c31d44ff856075ded29c2251@o89294.ingest.sentry.io/4504236923944960';
+      options.tracesSampleRate = 1.0;
+    },
+    appRunner: () => runApp(MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  final Future<Widget> _initialPage = _getInitialPage();
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Tagihan Wifi',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: SplashPage(), // Initial page to decide where to go
+    );
+  }
+}
 
-  static Future<Widget> _getInitialPage() async {
+class SplashPage extends StatelessWidget {
+  Future<bool> isLoggedIn() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
-    return token == null ? LoginPage() : TagihanPage();
+    return prefs.getString('token') != null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tagihan App',
-      theme: ThemeData(primarySwatch: Colors.red),
-      home: FutureBuilder<Widget>(
-        future: _initialPage,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
-            return CircularProgressIndicator();
-          return snapshot.data!;
-        },
-      ),
+    return FutureBuilder<bool>(
+      future: isLoggedIn(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasData && snapshot.data == true) {
+          return TagihanPage();
+        } else {
+          return LoginPage();
+        }
+      },
     );
   }
 }
