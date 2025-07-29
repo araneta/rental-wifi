@@ -63,7 +63,7 @@ class UsersSchema extends Schema implements UserInterface
             return NULL;
         }
         $user = new UsersSchema();
-        $user->id = $data['id'] ?? 0;
+        $user->id = $data['id'] ? intval($data['id']): 0;
         $user->email = $data['email'] ?? '';
         $user->password = $data['password'] ?? null;
         $user->role = $data['role'] ?? 'ROLE_USER';
