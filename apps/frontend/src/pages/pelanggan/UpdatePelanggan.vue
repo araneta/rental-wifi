@@ -90,6 +90,7 @@ export default {
     },
     async updatePelanggan() {
       try {
+        this.pelanggan.paket_id = parseInt(this.pelanggan.paket_id);
         await apiFetch(`/pelanggans/${this.pelanggan.id}`, {
           method: 'PUT',
           body: JSON.stringify(this.pelanggan)

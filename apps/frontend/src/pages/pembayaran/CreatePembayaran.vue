@@ -117,6 +117,7 @@ export default {
 		
       try {
 		this.form.jumlah = parseInt(this.form.jumlah);
+		this.form.pelanggan_id = parseInt(this.form.pelanggan_id);
         const res = await apiFetch('/pembayarans', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

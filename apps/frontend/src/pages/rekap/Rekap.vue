@@ -98,13 +98,15 @@ export default {
       })
     },
     async btndownloadExcel() {
-		if(!this.startDate){
-			alert('Pilih tanggal mulai');
-			return;
-		}
-		if(!this.endDate){
-			alert('Pilih tanggal akhir');
-			return;
+		if (this.filter === 'range') {
+			if(!this.startDate){
+				alert('Pilih tanggal mulai');
+				return;
+			}
+			if(!this.endDate){
+				alert('Pilih tanggal akhir');
+				return;
+			}
 		}
       let url = `/rekaps/excel?filter=${encodeURIComponent(this.filter)}`
       if (this.filter === 'range' && this.startDate && this.endDate) {

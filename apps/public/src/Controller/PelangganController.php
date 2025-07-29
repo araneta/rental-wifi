@@ -81,6 +81,7 @@ class PelangganController extends AbstractController {
             'pelanggan.id',
             'pelanggan.nama',
             'pelanggan.no_hp',
+            'pelanggan.alamat',
             'paket.nama AS paket_nama',
             'paket.harga AS paket_harga',
         ])
@@ -90,7 +91,7 @@ class PelangganController extends AbstractController {
             'pelanggan.paket_id',
             '=',
             'paket.id'
-        )
+        )->orderBy('pelanggan.nama', 'ASC')
         ->get();
         return $this->json([
                     'pelanggans' => $pelanggans,
@@ -113,12 +114,12 @@ class PelangganController extends AbstractController {
         // Insert with validation
         $ret = $db->insert(PelangganSchema::class)
                 ->values([
-                    'nama' => $newPelanggan->nama,
-                    'alamat' => $newPelanggan->alamat,
-                    'no_hp' => $newPelanggan->no_hp,
+                    'nama' => trim($newPelanggan->nama),
+                    'alamat' => trim($newPelanggan->alamat),
+                    'no_hp' => trim($newPelanggan->no_hp),
                     'status' => $newPelanggan->status,
                     'paket_id' => $newPelanggan->paket_id,
-                    'pop' => $newPelanggan->pop,
+                    'pop' => trim($newPelanggan->pop),
                     
                 ])
                 ->execute();
@@ -176,12 +177,12 @@ class PelangganController extends AbstractController {
         
         // Update with validation
         $ret = $db->update(PelangganSchema::class)
-        ->set(['nama'=>$existingPelanggan->nama,
-            'alamat'=>$existingPelanggan->alamat,
-            'no_hp'=>$existingPelanggan->no_hp, 
+        ->set(['nama'=>trim($existingPelanggan->nama),
+            'alamat'=>trim($existingPelanggan->alamat),
+            'no_hp'=>trim($existingPelanggan->no_hp), 
             'status'=> $existingPelanggan->status,
             'paket_id'=> $existingPelanggan->paket_id,
-            'pop'=> $existingPelanggan->pop,
+            'pop'=> trim($existingPelanggan->pop),
             ])                
          ->where('id','=',$id)
          ->execute();

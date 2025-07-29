@@ -64,6 +64,8 @@ export default {
     },
     async submitForm() {
       try {
+		this.form.jumlah = parseInt(this.form.jumlah);
+		this.form.pelanggan_id = parseInt(this.form.pelanggan_id);
         await apiFetch(`/pembayarans/${this.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },

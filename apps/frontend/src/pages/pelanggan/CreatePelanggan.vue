@@ -62,6 +62,7 @@ export default {
 
     const submitForm = async () => {
       try {
+		form.paket_id = parseInt(form.paket_id);
         await apiFetch('/pelanggans', {
           method: 'POST',
           body: JSON.stringify(form.value),

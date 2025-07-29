@@ -1,7 +1,13 @@
 <template>
   <div>
     <h2>Daftar Pelanggan</h2>
+
+    <div class="mb-3">
+      <input type="text" class="form-control" v-model="searchTerm" placeholder="Cari nama, alamat, no hp, atau paket...">
+    </div>
+
     <a href="/pelanggans/create" class="btn btn-primary mb-3">Tambah Pelanggan</a>
+
     <table class="table table-bordered" width="100%">
       <thead>
         <tr>
@@ -16,7 +22,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="pelanggan in pelanggans" :key="pelanggan.id">
+        <tr v-for="pelanggan in filteredPelanggans" :key="pelanggan.id">
           <td>{{ pelanggan.id }}</td>
           <td>{{ pelanggan.nama }}</td>
           <td>{{ pelanggan.alamat }}</td>
@@ -36,9 +42,8 @@
     </table>
   </div>
 </template>
-
 <script>
-import { apiFetch } from '../../api' // Your custom API handler
+import { apiFetch } from '../../api'
 import { useToast } from 'vue-toastification';
 const toast = useToast();
 
@@ -46,9 +51,21 @@ export default {
   name: 'Pelanggan',
   data() {
     return {
-      pelanggans: [
-        
-      ]
+      pelanggans: [],
+      searchTerm: ''
+    }
+  },
+  computed: {
+    filteredPelanggans() {
+      const term = this.searchTerm.toLowerCase();
+      return this.pelanggans.filter(p => {
+        return (
+          (p.nama && p.nama.toLowerCase().includes(term)) ||
+          (p.alamat && p.alamat.toLowerCase().includes(term)) ||
+          (p.no_hp && p.no_hp.toLowerCase().includes(term)) ||
+          (p.paket_nama && p.paket_nama.toLowerCase().includes(term))
+        );
+      });
     }
   },
   methods: {
@@ -77,6 +94,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-</style> 
