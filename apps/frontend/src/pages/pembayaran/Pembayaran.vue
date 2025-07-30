@@ -3,6 +3,13 @@
     <h2>Daftar Pembayaran</h2>
     <router-link to="/pembayarans/create" class="btn btn-primary mb-3">Tambah Pembayaran</router-link>
 
+    <input
+      type="text"
+      class="form-control mb-3"
+      placeholder="Cari berdasarkan nama pelanggan, petugas, bulan/tahun, metode, tanggal, atau jumlah"
+      v-model="searchQuery"
+    />
+
     <div class="table-responsive">
       <table class="table table-bordered" width="100%">
         <thead>
@@ -18,7 +25,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="row in pembayaranList" :key="row.id">
+          <tr v-for="row in filteredPembayaranList" :key="row.id">
             <td>{{ row.id }}</td>
             <td>{{ row.nama_petugas }}</td>
             <td>{{ row.nama_pelanggan }}</td>
@@ -36,9 +43,8 @@
     </div>
   </div>
 </template>
-
 <script>
-import { apiFetch } from '../../api' // Your custom API handler
+import { apiFetch } from '../../api'
 import { useToast } from 'vue-toastification'
 const toast = useToast()
 
@@ -46,7 +52,23 @@ export default {
   name: 'Pembayaran',
   data() {
     return {
-      pembayaranList: []
+      pembayaranList: [],
+      searchQuery: ''
+    }
+  },
+  computed: {
+    filteredPembayaranList() {
+      const q = this.searchQuery.toLowerCase()
+      return this.pembayaranList.filter(row => {
+        return (
+          (row.nama_pelanggan || '').toLowerCase().includes(q) ||
+          (row.nama_petugas || '').toLowerCase().includes(q) ||
+          (row.bulan_tahun || '').toLowerCase().includes(q) ||
+          (row.metode_pembayaran || '').toLowerCase().includes(q) ||
+          (row.tanggal_pembayaran || '').toLowerCase().includes(q) ||
+          String(row.jumlah || '').includes(q)
+        )
+      })
     }
   },
   async mounted() {

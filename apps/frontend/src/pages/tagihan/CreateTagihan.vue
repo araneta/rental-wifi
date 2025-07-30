@@ -90,6 +90,9 @@ export default {
 
     const submitForm = async () => {
       try {
+        form.value.jumlah = parseInt(form.value.jumlah);
+        form.value.pelanggan_id = parseInt(form.value.pelanggan_id);
+        form.value.petugas_id = parseInt(form.value.petugas_id);
         
         const res = await apiFetch('/tagihans', {
           method: 'POST',

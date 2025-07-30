@@ -67,6 +67,12 @@ export default {
 		if(this.form.tanggal_bayar==null){
 			this.form.tanggal_bayar = '';
 		}
+		
+		this.form.id = parseInt(this.form.id);
+		this.form.jumlah = parseInt(this.form.jumlah);
+		this.form.pelanggan_id = parseInt(this.form.pelanggan_id);
+		this.form.petugas_id = parseInt(this.form.petugas_id);
+		
         await apiFetch(`/tagihans/${this.tagihanId}`, {
           method: 'PUT',
           body: JSON.stringify(this.form)
