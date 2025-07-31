@@ -41,8 +41,8 @@ class TagihanSchema extends Schema
     public static function fromArray(array $data): TagihanSchema
     {
         $tagihan = new TagihanSchema();
-        $tagihan->id = $data['id'] ?? 0;
-        $tagihan->pelanggan_id = $data['pelanggan_id'] ?? 0;
+        $tagihan->id = isset($data['id']) ? intval($data['id']) :  0;
+        $tagihan->pelanggan_id = isset($data['pelanggan_id']) ? intval($data['pelanggan_id']) : 0;
         $tagihan->bulan_tahun = $data['bulan_tahun'] ?? '';
         $tagihan->jumlah = isset($data['jumlah']) ? (float)$data['jumlah'] : 0.0;
         $tagihan->status = $data['status'] ?? 'belum bayar';
