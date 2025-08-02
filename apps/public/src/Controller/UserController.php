@@ -180,6 +180,48 @@ final class UserController extends AbstractController {
         return $this->json(['success' => $ret, 'user'=>$newUser]);
     }
     
+    #[Route('/users/{id}', name: 'delete_user', methods: ['DELETE'])]
+    public function delete(Request $request, TokenStorageInterface $tokenStorage,  int $id): JsonResponse {
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return $this->json(['error' => 'Token not found'], 401);
+        }
+
+        $paket = $token->getUser();
+
+        $db = $this->drizzleService->getDb();
+
+        $userArr1 = $db->select(UsersSchema::class)
+                ->where('id', '=', $id)
+                ->first();
+        
+        if (!$userArr1) {
+            return $this->json(['error' => 'User does not exist'], 404);
+        }
+        
+        //check user data
+        $pembayaranArr = $db->select(PembayaranSchema::class)
+                ->where('petugas_id', '=', $id)
+                ->first();
+        if ($pembayaranArr) {
+            return $this->json(['error' => 'User punya data pembayaran'], 501);
+        }
+        
+        $tagihanArr = $db->select(TagihanSchema::class)
+                ->where('petugas_id', '=', $id)
+                ->first();
+        if ($tagihanArr) {
+            return $this->json(['error' => 'User punya data tagihan'], 501);
+        }
+        
+        $ret = $db->delete(UsersSchema::class)
+        ->where('id','=',$id)
+        ->execute();
+        return $this->json([
+                    'status' => $ret,
+        ]);
+    }
+    
    
     
     

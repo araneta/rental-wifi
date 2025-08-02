@@ -34,11 +34,11 @@ async function handleFetch(fullUrl, options = {}, redirectOnFail = false) {
 
     if (!res.ok) {
       const errorBody = isJson ? await res.json().catch(() => ({})) : await res.text();
-      console.error('API Error Response:', res.status, errorBody);
+      console.error('API Error Response:', res.status, errorBody.error);
 
       toast.error(
         `API Error ${res.status}: ` +
-        (typeof errorBody === 'string' ? errorBody : (errorBody.message || res.statusText))
+        (typeof errorBody === 'string' ? errorBody : (errorBody.error || res.statusText))
       );
 
       if (redirectOnFail) {

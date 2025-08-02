@@ -35,7 +35,7 @@ class PaketSchema extends Schema
             return NULL;
         }
         $paket = new PaketSchema();
-        $paket->id = $data['id'] ?? 0;
+        $paket->id = isset($data['id']) ? intval($data['id']) :  0;
         $paket->nama = $data['nama'] ?? '';
         $paket->kecepatan = $data['kecepatan'] ?? '';
         $paket->harga = $data['harga'] ?? 0;

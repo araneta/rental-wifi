@@ -19,9 +19,8 @@
           <td>{{ user.email }}</td>
           <td>{{ user.role }}</td>
           <td>
-            <a class="btn btn-warning" :href="`/users/${user.id}`">Edit</a>
-
-            <!-- <button class="btn btn-danger">Hapus</button> -->
+            <a class="btn btn-warning" :href="`/users/${user.id}`">Edit</a>&nbsp;
+            <button class="btn btn-danger" @click="deleteUser(user)">Hapus</button>
           </td>
         </tr>
       </tbody>
@@ -30,29 +29,43 @@
 </template>
 
 <script>
-import { apiFetch } from '../../api'; // or your API handler
+import { apiFetch } from '../../api';
+import { useToast } from 'vue-toastification';
+const toast = useToast();
 
 export default {
   name: 'Users',
   data() {
     return {
-      users: [
-       
-      ]
-    }
+      users: []
+    };
   },
   async mounted() {
-    try {
-      const data = await apiFetch('/users', { method: 'GET' });
-      console.log('data', data);
-      this.users = data.users;      
-    } catch (e) {
-      console.error('Fetch failed', e);
-      this.error = 'Gagal memuat data dashboard.';
+    await this.fetchUsers();
+  },
+  methods: {
+    async fetchUsers() {
+      try {
+        const data = await apiFetch('/users', { method: 'GET' });
+        this.users = data.users;
+      } catch (e) {
+        console.error('Fetch failed', e);
+        toast.error('Gagal memuat data pengguna.');
+      }
+    },
+    async deleteUser(user) {
+      const confirmed = confirm(`Yakin ingin menghapus user "${user.name}"?`);
+      if (!confirmed) return;
+
+      try {
+        await apiFetch(`/users/${user.id}`, { method: 'DELETE' });
+        toast.success(`User "${user.name}" berhasil dihapus.`);
+        await this.fetchUsers(); // refetch from API
+      } catch (err) {
+        console.error(err);
+        toast.error('Gagal menghapus user.');
+      }
     }
   }
 }
 </script>
-
-<style scoped>
-</style> 

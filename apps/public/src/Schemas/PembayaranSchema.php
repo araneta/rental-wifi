@@ -35,7 +35,7 @@ class PembayaranSchema extends Schema
     public static function fromArray(array $data): PembayaranSchema
     {
         $pembayaran = new PembayaranSchema();
-        $pembayaran->id = $data['id'] ?? 0;
+        $pembayaran->id = isset($data['id']) ? intval($data['id']) :  0;
         $pembayaran->tagihan_id = $data['tagihan_id'] ?? 0;
         $pembayaran->pelanggan_id = $data['pelanggan_id'] ?? 0;
         $pembayaran->petugas_id = $data['petugas_id'] ?? null;

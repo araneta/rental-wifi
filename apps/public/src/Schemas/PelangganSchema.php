@@ -41,7 +41,7 @@ class PelangganSchema extends Schema
             return NULL;
         }
         $pelanggan = new PelangganSchema();
-        $pelanggan->id = $data['id'] ?? 0;
+        $pelanggan->id = isset($data['id']) ? intval($data['id']) :  0;
         $pelanggan->nama = $data['nama'] ?? '';
         $pelanggan->alamat = $data['alamat'] ?? '';
         $pelanggan->no_hp = $data['no_hp'] ?? '';
