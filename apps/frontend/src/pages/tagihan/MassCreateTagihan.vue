@@ -53,6 +53,7 @@ export default {
 
     const submitForm = async () => {
       try {
+		form.value.petugas_id = parseInt(form.value.petugas_id);
         const res = await apiFetch('/tagihans/mass', {
           method: 'POST',
           body: JSON.stringify(form.value),

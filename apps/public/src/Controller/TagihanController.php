@@ -10,6 +10,7 @@ namespace App\Controller;
 use App\Model\MassTagihanEntryForm;
 use App\Model\TagihanEntryForm;
 use App\Model\TagihanUpdateForm;
+use App\Schemas\PaketSchema;
 use App\Schemas\PelangganSchema;
 use App\Schemas\TagihanSchema;
 use App\Schemas\UsersSchema;
@@ -223,15 +224,15 @@ class TagihanController extends AbstractController {
             'pelanggan.id',
             'pelanggan.nama',
             'pelanggan.no_hp',
-            'tagihan.nama AS tagihan_nama',
-            'tagihan.harga AS tagihan_harga',
+            'paket.nama AS tagihan_nama',
+            'paket.harga AS tagihan_harga',
         ])
         ->leftJoin(
-            TagihanSchema::getTableName(),   // 'tagihan'
-            TagihanSchema::class,
-            'pelanggan.tagihan_id',
+            PaketSchema::getTableName(),   // 'tagihan'
+            PaketSchema::class,
+            'pelanggan.paket_id',
             '=',
-            'tagihan.id'
+            'paket.id'
         )
         ->where('pelanggan.status', '=', 'aktif')
         ->get();
