@@ -16,9 +16,7 @@ class PembayaranEntryForm {
     //put your code here
     
     public function __construct(
-           #[Assert\Positive]
-            public int $jumlah,
-            
+          
             #[Assert\NotBlank]
             public string $metode_pembayaran,
             

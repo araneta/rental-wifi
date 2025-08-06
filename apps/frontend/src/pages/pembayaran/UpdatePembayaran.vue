@@ -3,10 +3,7 @@
     <h2>Edit Pembayaran</h2>
 
     <form @submit.prevent="submitForm">
-      <div class="mb-2">
-        <label>Jumlah</label>
-        <input type="number" v-model="form.jumlah" class="form-control" required />
-      </div>
+      
 
       <div class="mb-2">
         <label>Metode</label>

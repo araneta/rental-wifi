@@ -25,11 +25,7 @@
         </select>
       </div>
 
-      <div class="mb-3">
-        <label for="jumlah" class="form-label">Jumlah Pembayaran (Rp)</label>
-        <input type="number" v-model="form.jumlah" class="form-control" readonly required />
-      </div>
-
+      
       <div class="mb-3">
         <label for="metode_pembayaran" class="form-label">Metode Pembayaran</label>
         <select v-model="form.metode_pembayaran" class="form-control" required>

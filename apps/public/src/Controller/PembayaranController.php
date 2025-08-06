@@ -121,13 +121,19 @@ class PembayaranController extends AbstractController {
         if ($existing) {
             return $this->json(['error' => 'Pembayaran pelanggan sudah ada'], 409);
         }
-
+        $tagihan = $db->select(TagihanSchema::class)
+                ->where('id', '=', $newPembayaran->tagihan_id)                
+                ->where('pelanggan_id', '=', $newPembayaran->pelanggan_id)
+                ->first();
+        if(!$tagihan){
+            return $this->json(['error' => 'Tagihan not found'], 401);
+        }
         // Insert with validation
         $ret = $db->insert(PembayaranSchema::class)
                 ->values([
                     'pelanggan_id' => $newPembayaran->pelanggan_id,
                     'tagihan_id' => $newPembayaran->tagihan_id,
-                    'jumlah' => $newPembayaran->jumlah,
+                    'jumlah' => $tagihan['jumlah'],
                     'petugas_id' => $user->id,
                     'tanggal_pembayaran' => empty($newPembayaran->tanggal_pembayaran) ? NULL : $newPembayaran->tanggal_pembayaran,
                     'metode_pembayaran' => empty($newPembayaran->metode_pembayaran) ? "" : $newPembayaran->metode_pembayaran,                    
@@ -163,7 +169,15 @@ class PembayaranController extends AbstractController {
         if (!$pembayaranArr1) {
             return $this->json(['error' => 'Pembayaran does not exist'], 404);
         }
-         $newdata = ['jumlah'=>$existingPembayaran->jumlah,'metode_pembayaran'=>$existingPembayaran->metode_pembayaran,
+        $tagihan = $db->select(TagihanSchema::class)
+                ->where('id', '=', $newPembayaran->tagihan_id)                
+                ->where('pelanggan_id', '=', $newPembayaran->pelanggan_id)
+                ->first();
+        if(!$tagihan){
+            return $this->json(['error' => 'Tagihan not found'], 401);
+        }
+        
+         $newdata = ['jumlah'=>$tagihan['jumlah'],'metode_pembayaran'=>$existingPembayaran->metode_pembayaran,
              'tanggal_pembayaran'=>$existingPembayaran->tanggal_pembayaran];
         // Update with validation
         $ret = $db->update(PembayaranSchema::class)
