@@ -170,8 +170,8 @@ class PembayaranController extends AbstractController {
             return $this->json(['error' => 'Pembayaran does not exist'], 404);
         }
         $tagihan = $db->select(TagihanSchema::class)
-                ->where('id', '=', $newPembayaran->tagihan_id)                
-                ->where('pelanggan_id', '=', $newPembayaran->pelanggan_id)
+                ->where('id', '=', $pembayaranArr1['tagihan_id'])                
+                ->where('pelanggan_id', '=', $pembayaranArr1['pelanggan_id'])
                 ->first();
         if(!$tagihan){
             return $this->json(['error' => 'Tagihan not found'], 401);
