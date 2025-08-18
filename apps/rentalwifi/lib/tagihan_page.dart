@@ -12,6 +12,7 @@ class TagihanItem {
   final String id;
   final String pelanggan;
   final String bulanTahun;
+  final String alamat;
   final int jumlah;
   final String status;
 
@@ -19,6 +20,7 @@ class TagihanItem {
     required this.id,
     required this.pelanggan,
     required this.bulanTahun,
+    required this.alamat,
     required this.jumlah,
     required this.status,
   });
@@ -28,6 +30,7 @@ class TagihanItem {
       id: json['id'].toString(),
       pelanggan: json['pelanggan'] ?? '',
       bulanTahun: json['bulan_tahun'] ?? '',
+      alamat: json['alamat'] ?? '',
       jumlah: int.tryParse(json['jumlah']?.split('.')?.first ?? '0') ?? 0,
       status: json['status'] ?? '',
     );
@@ -177,6 +180,7 @@ class _TagihanPageState extends State<TagihanPage> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Text(item.alamat),
                                   Text(item.bulanTahun),
                                   Text('Rp${item.jumlah.toString().replaceAllMapped(RegExp(r'(\d{3})(?=\d)'), (m) => '${m[1]}.')}'),
                                   Text(item.status, style: TextStyle(color: item.status == 'dibayar' ? Colors.green : Colors.red)),

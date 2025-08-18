@@ -176,6 +176,7 @@ class TagihanController extends AbstractController {
             ->select([
                 'tagihan.*',
                 'pelanggan.nama AS pelanggan',
+                'pelanggan.alamat AS alamat',
                 'users.name AS petugas',
             ])
             ->join(
