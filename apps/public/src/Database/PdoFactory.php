@@ -16,6 +16,9 @@ class PdoFactory
 
         $pdo = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // ✅ Set session timezone (no SUPER privilege required)
+        $pdo->exec("SET time_zone = '+07:00'");
+        date_default_timezone_set('Asia/Jakarta');
         return $pdo;
     }
 }
