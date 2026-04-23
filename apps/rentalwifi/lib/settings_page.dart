@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:app_settings/app_settings.dart' as app_settings;
 import 'package:permission_handler/permission_handler.dart' show openAppSettings;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/printer_service.dart';
+import 'tagihan_page.dart';
+import 'login_page.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -110,6 +113,11 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
       builder: (_) => const _PrinterModal(),
     );
   }
+  void logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginPage()));
+  }
   
   // ── Build ─────────────────────────────────────────────────────────────────
 
@@ -125,6 +133,28 @@ class _SettingsScreenState extends State<SettingsScreen> with WidgetsBindingObse
         backgroundColor: Colors.white,
         elevation: 1,
       ),
+      drawer: Drawer(
+		child: ListView(
+		  children: [
+			DrawerHeader(child: Text('Menu', style: TextStyle(fontSize: 24))),
+			ListTile(
+			  leading: Icon(Icons.payment),
+			  title: Text('Tagihan'),
+			  onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => TagihanPage())),
+			),
+			ListTile(
+			  leading: Icon(Icons.settings),
+			  title: Text('Settings'),
+			  onTap: () => Navigator.pop(context),
+			),
+			ListTile(
+			  leading: Icon(Icons.logout),
+			  title: Text('Logout'),
+			  onTap: logout,
+			),
+		  ],
+		),
+	  ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -280,14 +310,18 @@ Future<void> _enableBluetooth() async {
         final printers = devices.where((d) => _likelyPrinter(d.name)).toList();
         final others   = devices.where((d) => !_likelyPrinter(d.name)).toList();
         final conn     = _service.connectedDevice;
-
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.75,
-          maxChildSize: 0.95,
-          builder: (_, scroll) => Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-            child: Column(children: [
+		return Scaffold(
+		  appBar: AppBar(
+			title: const Text('Settings'),
+			leading: IconButton(
+			  icon: const Icon(Icons.arrow_back),
+			  onPressed: () => Navigator.pop(context),
+			),
+		  ),
+		  
+		  body: Padding(
+			padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+			child: Column(children: [
               // Handle
               Center(child: Container(width: 40, height: 4,
                   decoration: BoxDecoration(color: Colors.grey[300],
@@ -510,7 +544,7 @@ Future<void> _enableBluetooth() async {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(color: Colors.grey, fontSize: 12)),
                           ]))
-                        : ListView(controller: scroll, children: [
+                        : ListView( children: [
                             ...printers.map((d) => _DeviceTile(
                               device: d,
                               connectedMac: conn?.macAdress,
@@ -529,11 +563,10 @@ Future<void> _enableBluetooth() async {
                             )),
                           ]),
               ),
-            ]),
-          ),
-        );
-      },
-    );
+            ])
+            ));            						
+        
+      } );
   }
 
   Widget _paperBtn(String label, PaperSize size) {
