@@ -6,7 +6,10 @@ import 'package:intl/intl.dart';
 import 'Config.dart';
 import 'login_page.dart';
 import 'pembayaran_page.dart';
+import 'settings_page.dart';
 import 'month_picker.dart';
+import 'package:provider/provider.dart';
+import './services/printer_service.dart';
 
 class TagihanItem {
   final String id;
@@ -101,112 +104,121 @@ class _TagihanPageState extends State<TagihanPage> {
 	  }
   @override
   Widget build(BuildContext context) {
-    final filteredItems = filteredTagihan;//allItems.where((item) => item.pelanggan.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+	return Consumer<PrinterService>(builder: (_,  printer,  __) {
+		final filteredItems = filteredTagihan;//allItems.where((item) => item.pelanggan.toLowerCase().contains(searchQuery.toLowerCase())).toList();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Daftar Tagihan'),
-        actions: [IconButton(icon: Icon(Icons.logout), onPressed: logout)],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            DrawerHeader(child: Text('Menu', style: TextStyle(fontSize: 24))),
-            ListTile(
-              leading: Icon(Icons.payment),
-              title: Text('Tagihan'),
-              onTap: () => Navigator.pop(context),
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              onTap: logout,
-            ),
-          ],
-        ),
-      ),
-      body: RefreshIndicator(
-        onRefresh: fetchData,
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: TextField(
-                decoration: InputDecoration(hintText: 'Pencarian', prefixIcon: Icon(Icons.search)),
-                onChanged: (val) => setState(() => searchQuery = val),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                value: selectedStatus,
-                items: statusOptions
-                    .map((status) => DropdownMenuItem(value: status, child: Text(status.toUpperCase())))
-                    .toList(),
-                onChanged: (val) {
-                  setState(() {
-                    selectedStatus = val!;
-                  });
-                  fetchData();
-                },
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: MonthPickerField(
-					onChanged: (date) {
-						// Use DateFormat('yyyy-MM').format(date) to filter
-						//print('Selected month: ${DateFormat('yyyy-MM').format(date)}');
-						setState((){
-							filterBulanTahun = DateFormat('yyyy-MM').format(date);
-						});
-					},
+		return Scaffold(
+		  appBar: AppBar(
+			title: Text('Daftar Tagihan'),
+			actions: [IconButton(icon: Icon(Icons.logout), onPressed: logout)],
+		  ),
+		  drawer: Drawer(
+			child: ListView(
+			  children: [
+				DrawerHeader(child: Text('Menu', style: TextStyle(fontSize: 24))),
+				ListTile(
+				  leading: Icon(Icons.payment),
+				  title: Text('Tagihan'),
+				  onTap: () => Navigator.pop(context),
 				),
-            ),
-           
-            Expanded(
-              child: isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : filteredItems.isEmpty
-                      ? Center(child: Text("Tidak ada data"))
-                      : ListView.separated(
-                          itemCount: filteredItems.length,
-                          separatorBuilder: (_, __) => Divider(),
-                          itemBuilder: (context, index) {
-                            final item = filteredItems[index];
-                            return ListTile(
-                              title: Text(item.pelanggan),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(item.alamat),
-                                  Text(item.bulanTahun),
-                                  Text('Rp${item.jumlah.toString().replaceAllMapped(RegExp(r'(\d{3})(?=\d)'), (m) => '${m[1]}.')}'),
-                                  Text(item.status, style: TextStyle(color: item.status == 'dibayar' ? Colors.green : Colors.red)),
-                                ],
-                              ),
-                              trailing: item.status == 'belum bayar'
-                                  ? ElevatedButton(
-                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                       onPressed: () {
-										  Navigator.push(
-											context,
-											MaterialPageRoute(
-											  builder: (_) => PembayaranPage(tagihanId: item.id),
-											),
-										  );
-										},
-                                      child: Text('BAYAR',  style: TextStyle(color:Colors.white)),
-                                    )
-                                  : null,
-                            );
-                          },
-                        ),
-            ),
-          ],
-        ),
-      ),
-    );
+				ListTile(
+				  leading: Icon(Icons.settings),
+				  title: Text('Settings'),
+				  onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => SettingsScreen())),
+				),
+				ListTile(
+				  leading: Icon(Icons.logout),
+				  title: Text('Logout'),
+				  onTap: logout,
+				),
+			  ],
+			),
+		  ),
+		  body: RefreshIndicator(
+			onRefresh: fetchData,
+			child: Column(
+			  children: [
+				Padding(
+				  padding: EdgeInsets.all(8),
+				  child: TextField(
+					decoration: InputDecoration(hintText: 'Pencarian', prefixIcon: Icon(Icons.search)),
+					onChanged: (val) => setState(() => searchQuery = val),
+				  ),
+				),
+				Padding(
+				  padding: EdgeInsets.symmetric(horizontal: 8),
+				  child: DropdownButton<String>(
+					isExpanded: true,
+					value: selectedStatus,
+					items: statusOptions
+						.map((status) => DropdownMenuItem(value: status, child: Text(status.toUpperCase())))
+						.toList(),
+					onChanged: (val) {
+					  setState(() {
+						selectedStatus = val!;
+					  });
+					  fetchData();
+					},
+				  ),
+				),
+				Padding(
+				  padding: EdgeInsets.all(8),
+				  child: MonthPickerField(
+						onChanged: (date) {
+							// Use DateFormat('yyyy-MM').format(date) to filter
+							//print('Selected month: ${DateFormat('yyyy-MM').format(date)}');
+							setState((){
+								filterBulanTahun = DateFormat('yyyy-MM').format(date);
+							});
+						},
+					),
+				),
+			   
+				Expanded(
+				  child: isLoading
+					  ? Center(child: CircularProgressIndicator())
+					  : filteredItems.isEmpty
+						  ? Center(child: Text("Tidak ada data"))
+						  : ListView.separated(
+							  itemCount: filteredItems.length,
+							  separatorBuilder: (_, __) => Divider(),
+							  itemBuilder: (context, index) {
+								final item = filteredItems[index];
+								return ListTile(
+								  title: Text(item.pelanggan),
+								  subtitle: Column(
+									crossAxisAlignment: CrossAxisAlignment.start,
+									children: [
+									  Text(item.alamat),
+									  Text(item.bulanTahun),
+									  Text('Rp${item.jumlah.toString().replaceAllMapped(RegExp(r'(\d{3})(?=\d)'), (m) => '${m[1]}.')}'),
+									  Text(item.status, style: TextStyle(color: item.status == 'dibayar' ? Colors.green : Colors.red)),
+									],
+								  ),
+								  trailing: item.status == 'belum bayar'
+									  ? ElevatedButton(
+										  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+										   onPressed: () {
+											  Navigator.push(
+												context,
+												MaterialPageRoute(
+												  builder: (_) => PembayaranPage(tagihanId: item.id),
+												),
+											  );
+											},
+										  child: Text('BAYAR',  style: TextStyle(color:Colors.white)),
+										)
+									  : null,
+								);
+							  },
+							),
+				),
+			  ],
+			),
+		  ),
+		);
+	});
+	
+    
   }
 }

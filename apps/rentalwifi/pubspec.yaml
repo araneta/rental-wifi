@@ -38,6 +38,19 @@ dependencies:
   http: ^1.2.2
   shared_preferences: ^2.2.3
   intl: ^0.20.2
+  # State management
+  provider: ^6.1.1
+  
+  # Runtime permissions (Bluetooth on Android 12+)
+  permission_handler: ^11.3.1
+
+  # URL launcher (for Stripe/PayPal checkout)
+  url_launcher: ^6.3.0
+
+  # Bluetooth ESC/POS thermal printing
+  print_bluetooth_thermal: ^1.1.7
+  esc_pos_utils: ^1.1.0
+  app_settings: ^5.1.1
 
 dev_dependencies:
   flutter_test:

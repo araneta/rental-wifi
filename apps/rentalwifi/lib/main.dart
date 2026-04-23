@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:provider/provider.dart';
 import 'login_page.dart';
 import 'tagihan_page.dart';
+import 'settings_page.dart';
+import 'services/printer_service.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp()); // Sentry dihapus, langsung jalankan app
+  runApp(MultiProvider(
+        providers: [          
+
+          // ✅ ADD THIS
+          ChangeNotifierProvider(create: (_) => PrinterService()),
+          
+        ],
+        child: MyApp(),
+      )
+  ); // Sentry dihapus, langsung jalankan app
 }
 
 class MyApp extends StatelessWidget {
