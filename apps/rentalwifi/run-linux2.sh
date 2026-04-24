@@ -10,10 +10,6 @@ export ANDROID_SDK=/mnt/projects1/apps/Android/Sdk
 export ANDROID_SDK_ROOT=/mnt/projects1/apps/Android/Sdk
 export PATH=$ANDROID_SDK:$PATH
 export ANDROID_SDK_ROOT=/mnt/projects1/apps/Android/Sdk
-# Flutter
-export FLUTTER=/mnt/projects1/apps/flutter-3.7.12/flutter
-export PATH=$FLUTTER/bin:$PATH
-flutter config --android-sdk ANDROID_SDK
-
-flutter build apk
-
+export PATH="/home/araneta/fvm/bin:$PATH"
+source ~/.bashrc 
+fvm flutter build apk

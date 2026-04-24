@@ -62,6 +62,8 @@ class _PembayaranPageState extends State<PembayaranPage> {
       );
       if (res.statusCode == 200) {
         final data = json.decode(res.body);
+         //debugPrint(data.toString());
+        //print(data);
         setState(() => pelangganList = data['pelanggans'] ?? []);
       } else {
         setState(() {
@@ -88,8 +90,10 @@ class _PembayaranPageState extends State<PembayaranPage> {
       form['jumlah'] = '';
     });
     try {
-      final res = await http.get(
-        Uri.parse(Config.API_HOST+'/api/tagihans/by-pelanggan/$pelangganId'),
+		var url = Config.API_HOST+'/api/tagihans/by-pelanggan/$pelangganId';
+		print("url "+url);
+      final res = await http.get(		
+        Uri.parse(url),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (res.statusCode == 200) {
@@ -209,11 +213,12 @@ class _PembayaranPageState extends State<PembayaranPage> {
     final token = await getToken();
     setState(() => isPrinting = true);
 		try {
+			final formattedDate = DateFormat('dd MMMM yyyy', 'id').format(DateTime.parse(form['tanggal_pembayaran']));
 			await printReceiptWithFeedback(
 				context: context,
-				name: form['pelanggan_id'],
-				month: form['pelanggan_id'],				
-				paymentDate: form['tanggal_pembayaran'],
+				name: form['pelanggan_nama'],
+				month: form['bulan_tahun'],				
+				paymentDate: formattedDate,
 				formatPrice: form['jumlah'],
 				navigateToSettings: () => Navigator.pushNamed(context, '/settings'),
 			  );
@@ -256,9 +261,14 @@ class _PembayaranPageState extends State<PembayaranPage> {
                       }).toList(),
                       decoration: InputDecoration(labelText: 'Pilih Pelanggan'),
                       onChanged: (val) {
-                        setState(() {
-                          form['pelanggan_id'] = val;
-                        });
+                        final selected = pelangganList.firstWhere(
+							(p) => p['id'].toString() == val,
+						  );
+
+						  setState(() {
+							form['pelanggan_id'] = val;
+							form['pelanggan_nama'] = selected['nama']; // <-- get text here
+						  });
                         fetchTagihan(val as String);
                       },
                       validator: (val) => val == null ? 'Harus dipilih' : null,
@@ -274,11 +284,17 @@ class _PembayaranPageState extends State<PembayaranPage> {
                       }).toList(),
                       decoration: InputDecoration(labelText: 'Pilih Tagihan'),
                       onChanged: (val) {
-                        setState(() {
-                          form['tagihan_id'] = val;
-                        });
-                        updateJumlah(val  as String);
-                      },
+						  final selected = tagihanList.firstWhere(
+							(t) => t['id'].toString() == val,
+						  );
+
+						  setState(() {
+							form['tagihan_id'] = val;
+							form['bulan_tahun'] = selected['bulan_tahun']; // 👈 get it here
+						  });
+
+						  updateJumlah(val as String);
+						},
                       validator: (val) => val == null ? 'Harus dipilih' : null,
                     ),
                     SizedBox(height: 16),

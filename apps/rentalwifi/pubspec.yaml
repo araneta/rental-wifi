@@ -36,13 +36,13 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   http: ^1.2.2
-  shared_preferences: ^2.2.3
+  shared_preferences: ^2.5.5
   intl: ^0.20.2
   # State management
   provider: ^6.1.1
   
   # Runtime permissions (Bluetooth on Android 12+)
-  permission_handler: ^11.3.1
+  permission_handler: ^12.0.1
 
   # URL launcher (for Stripe/PayPal checkout)
   url_launcher: ^6.3.0
@@ -50,7 +50,7 @@ dependencies:
   # Bluetooth ESC/POS thermal printing
   print_bluetooth_thermal: ^1.1.7
   esc_pos_utils: ^1.1.0
-  app_settings: ^5.1.1
+  app_settings: ^7.0.0
 
 dev_dependencies:
   flutter_test:
@@ -61,7 +61,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

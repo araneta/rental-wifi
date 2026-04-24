@@ -1,4 +1,4 @@
-export JAVA_HOME=/media/araneta/49909430-d2bd-4bcf-be1d-3c425a4013bf/apps/jdk-17.0.11
+export JAVA_HOME=/mnt/projects1/apps/jdk-17.0.11
 export PATH=$JAVA_HOME/bin:$PATH
 
 export ANDROID=/mnt/projects1/apps/Android/Sdk
