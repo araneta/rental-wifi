@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'tagihan_page.dart';
 import 'Config.dart';
-import 'services/printer_service.dart';
-import 'print_helper.dart';
 
 class PembayaranPage extends StatefulWidget {
   final String? tagihanId;
@@ -36,7 +33,6 @@ class _PembayaranPageState extends State<PembayaranPage> {
   String alertType = 'success';
   bool isLoading = false;
   bool isSubmitting = false;
-  bool isPrinting = false;
 
   @override
   void initState() {
@@ -94,8 +90,6 @@ class _PembayaranPageState extends State<PembayaranPage> {
       );
       if (res.statusCode == 200) {
         final data = json.decode(res.body);
-        debugPrint(data.toString());
-        print(data);
         setState(() => tagihanList = data['tagihans'] ?? []);
       } else {
         setState(() {
@@ -196,35 +190,6 @@ class _PembayaranPageState extends State<PembayaranPage> {
       setState(() => isSubmitting = false);
     }
   }
-  void _showSnack(String msg, {bool isError = false}) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: isError ? const Color(0xFFFF3B30) : const Color(0xFF34C759),
-      ),
-    );
-  }
-  Future<void> printForm() async {
-    final token = await getToken();
-    setState(() => isPrinting = true);
-		try {
-			await printReceiptWithFeedback(
-				context: context,
-				name: form['pelanggan_id'],
-				month: form['pelanggan_id'],				
-				paymentDate: form['tanggal_pembayaran'],
-				formatPrice: form['jumlah'],
-				navigateToSettings: () => Navigator.pushNamed(context, '/settings'),
-			  );
-		  } catch (e) {
-			_showSnack(e.toString(), isError: true);
-		  }finally{
-			 setState(() {
-			  isPrinting = false;			  
-			}); 
-		  }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -316,45 +281,17 @@ class _PembayaranPageState extends State<PembayaranPage> {
                         }
                       },
                     ),
-                    SizedBox(height: 20),                    
-					Row(
-					  mainAxisAlignment: MainAxisAlignment.start, // or center / spaceBetween
-					  children: [
-						ElevatedButton(
-						  onPressed: isSubmitting
-							  ? null
-							  : () {
-								  if (_formKey.currentState?.validate() ?? false) {
-									submitForm();
-								  }
-								},
-						  child: isSubmitting
-							  ? SizedBox(
-								  width: 16,
-								  height: 16,
-								  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-								)
-							  : Text('Simpan'),
-						),
-						SizedBox(width: 12),
-						ElevatedButton(
-						  onPressed: isPrinting
-							  ? null
-							  : () {
-								  if (_formKey.currentState?.validate() ?? false) {
-									printForm();
-								  }
-								},
-						  child: isPrinting
-							  ? SizedBox(
-								  width: 16,
-								  height: 16,
-								  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-								)
-							  : Text('Print'),
-						),
-					  ],
-					),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: isSubmitting
+                          ? null
+                          : () {
+                              if (_formKey.currentState?.validate() ?? false) {
+                                submitForm();
+                              }
+                            },
+                      child: isSubmitting ? CircularProgressIndicator() : Text('Simpan'),
+                    )
                   ],
                 ),
               ),

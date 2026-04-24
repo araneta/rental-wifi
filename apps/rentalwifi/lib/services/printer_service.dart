@@ -302,13 +302,11 @@ class PrinterService extends ChangeNotifier {
   // ── Receipt printing ──────────────────────────────────────────────────────
 
   Future<bool> printReceipt({
-    required Map<String, dynamic> order,
-    String storeName = 'BoltexPOS',
-    String storeAddress = '',
-    String storePhone = '',
-    String storeEmail = '',
-    String storeWebsite = '',
-    String storeTaxId = '',
+    required String storeName,
+    required String phone, 
+    required String name,
+    required String month,
+    required String paymentDate,
     required String Function(double) formatPrice,
     PaperSize paperSize = PaperSize.mm58,
   }) async {
@@ -347,14 +345,12 @@ class PrinterService extends ChangeNotifier {
 
     try {
       final bytes = await _buildReceipt(
-        order: order,
-        storeName: storeName,
-        storeAddress: storeAddress,
-        storePhone: storePhone,
-        storeEmail: storeEmail,
-        storeWebsite: storeWebsite,
-        storeTaxId: storeTaxId,
-        formatPrice: formatPrice,
+      storeName: storeName,
+      phone: phone, 
+	  name: name,
+	  month: month,
+      paymentDate: paymentDate,
+      formatPrice: formatPrice,        
         paperSize: paperSize,
       );
       final ok = await PrintBluetoothThermal.writeBytes(bytes);
@@ -374,15 +370,13 @@ class PrinterService extends ChangeNotifier {
   // ── ESC/POS receipt builder  (mirrors printer.ts) ───────────────────────────
 
   Future<List<int>> _buildReceipt({
-    required Map<String, dynamic> order,
     required String storeName,
-    required String storeAddress,
-    required String storePhone,
-    required String storeEmail,
-    required String storeWebsite,
-    required String storeTaxId,
+    required String phone, 
+    required String name,
+    required String month,
+    required String paymentDate,
     required String Function(double) formatPrice,
-    required PaperSize paperSize,
+    PaperSize paperSize = PaperSize.mm58,
   }) async {
     final profile = await CapabilityProfile.load();
     final gen     = Generator(paperSize, profile);
@@ -400,175 +394,17 @@ class PrinterService extends ChangeNotifier {
         width: PosTextSize.size2,
       ),
     );
-    if (storePhone.isNotEmpty)
-      bytes += gen.text(storePhone, styles: const PosStyles(align: PosAlign.center));
-    if (storeEmail.isNotEmpty)
-      bytes += gen.text(storeEmail, styles: const PosStyles(align: PosAlign.center));
-    if (storeAddress.isNotEmpty)
-      bytes += gen.text(storeAddress, styles: const PosStyles(align: PosAlign.center));
-    if (storeWebsite.isNotEmpty)
-      bytes += gen.text(storeWebsite, styles: const PosStyles(align: PosAlign.center));
-    if (storeTaxId.isNotEmpty)
-      bytes += gen.text('Tax ID: $storeTaxId', styles: const PosStyles(align: PosAlign.center));
-
-    bytes += gen.hr();
-
-    // ── Customer info (if present) ────────────────────────────────────────────
-    final cust = order['customer'] as Map<String, dynamic>?;
-    if (cust != null) {
-      final custName    = cust['name']?.toString() ?? '';
-      final custEmail   = cust['email']?.toString() ?? '';
-      final custPhone   = cust['phone']?.toString() ?? '';
-      final custAddress = cust['address']?.toString() ?? '';
-      if (custName.isNotEmpty) {
-        bytes += gen.hr(ch: '-');
-        bytes += gen.text('Customer: $custName');
-        if (custEmail.isNotEmpty)   bytes += gen.text('Email: $custEmail');
-        if (custPhone.isNotEmpty)   bytes += gen.text('Phone: $custPhone');
-        if (custAddress.isNotEmpty) bytes += gen.text('Address: $custAddress');
-      }
+    if (phone.isNotEmpty){
+      bytes += gen.text("Info Keluhan :"+ phone, styles: const PosStyles(align: PosAlign.center));
     }
-
-    // ── Order info ────────────────────────────────────────────────────────────
+    //bytes += gen.text("-----------------------", styles: const PosStyles(align: PosAlign.center));    
     bytes += gen.hr(ch: '-');
-    final orderId = order['id']?.toString() ?? 'N/A';
-    bytes += gen.text('Order #$orderId');
-
-    final rawDate = order['date']?.toString() ??
-        order['createdAt']?.toString() ?? '';
-    if (rawDate.isNotEmpty) {
-      try {
-        final dt = DateTime.parse(rawDate).toLocal();
-        bytes += gen.text(
-            'Date: ${_p(dt.day)}/${_p(dt.month)}/${dt.year}');
-        bytes += gen.text(
-            'Time: ${_p(dt.hour)}:${_p(dt.minute)}:${_p(dt.second)}');
-      } catch (_) {
-        bytes += gen.text('Date: $rawDate');
-      }
-    }
-
-    final empName = (order['employee'] as Map<String, dynamic>?)?['name']
-            ?.toString() ??
-        '';
-    if (empName.isNotEmpty) bytes += gen.text('Cashier: $empName');
-
-    bytes += gen.hr(ch: '-');
-
-    // ── Items ─────────────────────────────────────────────────────────────────
-    bytes += gen.text('ITEMS:');
-
-    final items = (order['items'] as List?) ?? [];
-    for (final raw in items) {
-      final item   = raw as Map<String, dynamic>;
-      final name   = item['name']?.toString() ?? '';
-      final qty    = (item['quantity'] as num? ?? 1).toInt();
-      final price  = double.tryParse(item['price']?.toString() ?? '0') ?? 0;
-      final disc   = double.tryParse(
-              item['discount_amount']?.toString() ?? '0') ??
-          0;
-      final discType  = item['discountType']?.toString() ?? '';
-      final discValue = item['discountValue']?.toString() ?? '';
-      final itemTotal = price * qty;
-      final itemSub   = itemTotal - disc;
-
-      // Item name — own line
-      bytes += gen.text(name);
-      // Qty x price = total
-      bytes += gen.text(
-          '  $qty x ${formatPrice(price)} = ${formatPrice(itemTotal)}');
-
-      // Discount line
-      if (disc > 0) {
-        final discLabel = discType == 'percentage'
-            ? '$discValue% off'
-            : '-${formatPrice(disc)}';
-        bytes += gen.text('  Discount: $discLabel');
-        bytes += gen.text('  Subtotal: ${formatPrice(itemSub)}');
-      }
-    }
-
-    bytes += gen.hr(ch: '-');
-
-    // ── Totals (RIGHT aligned) ────────────────────────────────────────────────
-    final subtotal   = double.tryParse(order['subtotal']?.toString() ?? '0') ?? 0;
-    final totalItemDiscs = items.fold<double>(
-        0,
-        (s, raw) =>
-            s + (double.tryParse(
-                    (raw as Map<String, dynamic>)['discount_amount']?.toString() ?? '0') ??
-                0));
-    final orderDisc  = double.tryParse(
-            order['discount_amount']?.toString() ??
-                order['discountAmount']?.toString() ??
-                '0') ??
-        0;
-    final discCode   = order['discountCode']?.toString() ?? '';
-    final taxAmt     = double.tryParse(
-            order['tax_amount']?.toString() ??
-                order['taxAmount']?.toString() ??
-                '0') ??
-        0;
-    final total      = double.tryParse(order['total']?.toString() ?? '0') ?? 0;
-
-    _rightRow(gen, bytes, 'Subtotal:', formatPrice(subtotal));
-    if (totalItemDiscs > 0)
-      _rightRow(gen, bytes, 'Item Discounts:', '-${formatPrice(totalItemDiscs)}');
-    if (orderDisc > 0)
-      _rightRow(
-        gen, bytes,
-        'Order Discount${discCode.isNotEmpty ? ' ($discCode)' : ''}:',
-        '-${formatPrice(orderDisc)}',
-      );
-    if (taxAmt > 0) _rightRow(gen, bytes, 'Tax:', formatPrice(taxAmt));
-
-    bytes += gen.hr(ch: '=');
-    bytes += gen.text(
-      'TOTAL: ${formatPrice(total)}',
-      styles: const PosStyles(
-        bold: true,
-        align: PosAlign.right,
-        height: PosTextSize.size2,
-        width: PosTextSize.size2,
-      ),
-    );
-    bytes += gen.hr(ch: '=');
-
-    // ── Payment ───────────────────────────────────────────────────────────────
-    final payments = (order['paymentDetails'] as List?) ?? [];
-    if (payments.isNotEmpty) {
-      bytes += gen.feed(1);
-      bytes += gen.text('PAYMENT:');
-      for (final raw in payments) {
-        final pm     = raw as Map<String, dynamic>;
-        final method = _humanMethod(pm['method']?.toString() ?? '');
-        final amount = double.tryParse(pm['amount']?.toString() ?? '0') ?? 0;
-        final change = double.tryParse(pm['change']?.toString() ?? '0') ?? 0;
-        final txId   = pm['transactionId']?.toString() ?? '';
-        final last4  = pm['cardLast4']?.toString() ?? '';
-        final brand  = pm['cardBrand']?.toString() ?? '';
-
-        bytes += gen.text('$method: ${formatPrice(amount)}');
-        if (txId.isNotEmpty)
-          bytes += gen.text('  Transaction ID: $txId',
-              styles: const PosStyles(fontType: PosFontType.fontB));
-        if (last4.isNotEmpty)
-          bytes += gen.text('  Card: ****$last4${brand.isNotEmpty ? ' ($brand)' : ''}',
-              styles: const PosStyles(fontType: PosFontType.fontB));
-        if (change > 0)
-          bytes += gen.text('  Change: ${formatPrice(change)}');
-      }
-    } else {
-      final method = _humanMethod(order['paymentMethod']?.toString() ?? '');
-      if (method.isNotEmpty) bytes += gen.text('Payment: $method');
-    }
-
-    // ── Footer ────────────────────────────────────────────────────────────────
-    bytes += gen.hr(ch: '-');
-    bytes += gen.text('Thank you for your purchase!',
-        styles: const PosStyles(align: PosAlign.center, bold: true));
-    bytes += gen.text('Please come again',
-        styles: const PosStyles(align: PosAlign.center));
+    bytes += gen.text(paymentDate, styles: const PosStyles(align: PosAlign.center));
+    bytes += gen.feed(3);
+    bytes += gen.text('Nama: $name');
+    bytes += gen.text('Bulan: $month');
+    bytes += gen.text('Total: $formatPrice');
+    bytes += gen.text('Nama: $name');
     bytes += gen.feed(3);
     bytes += gen.cut();
 
