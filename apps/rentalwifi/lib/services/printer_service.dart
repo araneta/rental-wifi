@@ -404,12 +404,13 @@ class PrinterService extends ChangeNotifier {
     //bytes += gen.text("-----------------------", styles: const PosStyles(align: PosAlign.center));    
     bytes += gen.hr(ch: '-');
     bytes += gen.text(paymentDate, styles: const PosStyles(align: PosAlign.center));
-    bytes += gen.feed(3);
+    bytes += gen.feed(1);
     bytes += gen.text('Nama  : $name');
     bytes += gen.text('Bulan : $month');
     bytes += gen.text('Total : $formatPrice');
-    bytes += gen.text('Nama  : $name');
-    bytes += gen.feed(3);
+    bytes += gen.feed(1);
+    bytes += gen.text("Terima Kasih", styles: const PosStyles(align: PosAlign.center));
+    bytes += gen.feed(2);
     bytes += gen.cut();
 
     return bytes;
