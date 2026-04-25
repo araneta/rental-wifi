@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'tagihan_page.dart';
 import 'Config.dart';
@@ -199,7 +200,8 @@ class _PembayaranPageState extends State<PembayaranPage> {
     } finally {
       setState(() => isSubmitting = false);
     }
-  }
+  }   
+  
   void _showSnack(String msg, {bool isError = false}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -209,17 +211,54 @@ class _PembayaranPageState extends State<PembayaranPage> {
       ),
     );
   }
+  
+  String formatMonthYear(String input) {
+	  final date = DateTime.parse("$input-01"); // add day to make it valid
+	  return DateFormat('MMMM yyyy', 'id_ID').format(date);
+  }
+  
   Future<void> printForm() async {
-    final token = await getToken();
-    setState(() => isPrinting = true);
+		//validate 	  
+		final tanggal = form['tanggal_pembayaran'];
+		if (tanggal == null || (tanggal is String && tanggal.trim().isEmpty)) {
+		  // it's null or empty
+			_showSnack("Tanggal Pembayaran Tidak Boleh Kosong", isError: true);
+			return;
+		}
+	  
+		final token = await getToken();
+		setState(() => isPrinting = true);
+		print("print form");
+		final selectedPelanggan = pelangganList.firstWhere(
+			(p) => p['id'].toString() == form['pelanggan_id'],
+		);
+		print("selectedPelanggan");
+		print(selectedPelanggan);
+		
+		final selectedTagihan = tagihanList.firstWhere(
+			(t) => t['id'].toString() == form['tagihan_id'],
+		);
+		print("selectedTagihan");
+		print(selectedTagihan);
+		final bulanTahun = formatMonthYear(selectedTagihan['bulan_tahun']);
+		
+		print("tanggal_pembayaran "+tanggal);
+		final formattedDate = DateFormat('dd MMMM yyyy', 'id').format(DateTime.parse(tanggal));
+		print("formattedDate "+formattedDate);
+		print("pelanggan_id "+form['pelanggan_id']);
+		print("pelanggan_nama "+selectedPelanggan['nama']);
+		print("bulan_tahun "+bulanTahun);
+		final jumlah = double.tryParse(form['jumlah']) ?? 0;
+		final jumlahText = "Rp ${jumlah.toStringAsFixed(0)}";
+		print("jumlah "+jumlahText);		
 		try {
-			final formattedDate = DateFormat('dd MMMM yyyy', 'id').format(DateTime.parse(form['tanggal_pembayaran']));
+			
 			await printReceiptWithFeedback(
 				context: context,
-				name: form['pelanggan_nama'],
-				month: form['bulan_tahun'],				
+				name: selectedPelanggan['nama'],
+				month: bulanTahun,				
 				paymentDate: formattedDate,
-				formatPrice: form['jumlah'],
+				formatPrice:jumlahText,
 				navigateToSettings: () => Navigator.pushNamed(context, '/settings'),
 			  );
 		  } catch (e) {
@@ -260,14 +299,9 @@ class _PembayaranPageState extends State<PembayaranPage> {
                         );
                       }).toList(),
                       decoration: InputDecoration(labelText: 'Pilih Pelanggan'),
-                      onChanged: (val) {
-                        final selected = pelangganList.firstWhere(
-							(p) => p['id'].toString() == val,
-						  );
-
+                      onChanged: (val) {                        
 						  setState(() {
-							form['pelanggan_id'] = val;
-							form['pelanggan_nama'] = selected['nama']; // <-- get text here
+							form['pelanggan_id'] = val;							
 						  });
                         fetchTagihan(val as String);
                       },
@@ -283,14 +317,9 @@ class _PembayaranPageState extends State<PembayaranPage> {
                         );
                       }).toList(),
                       decoration: InputDecoration(labelText: 'Pilih Tagihan'),
-                      onChanged: (val) {
-						  final selected = tagihanList.firstWhere(
-							(t) => t['id'].toString() == val,
-						  );
-
+                      onChanged: (val) {						  
 						  setState(() {
-							form['tagihan_id'] = val;
-							form['bulan_tahun'] = selected['bulan_tahun']; // 👈 get it here
+							form['tagihan_id'] = val;							
 						  });
 
 						  updateJumlah(val as String);

@@ -307,11 +307,15 @@ class PrinterService extends ChangeNotifier {
     required String name,
     required String month,
     required String paymentDate,
-    required String Function(double) formatPrice,
+    required String formatPrice,
     PaperSize paperSize = PaperSize.mm58,
   }) async {
     // Check Bluetooth is on first
     debugPrint('[Printer] Starting receipt print');
+    final hasPerm = await requestPermissions();
+	if (!hasPerm){
+		throw Exception('permission denied');
+	}
     if (!await isBluetoothEnabled()) {
       throw Exception('BLUETOOTH_OFF');
     }
@@ -375,7 +379,7 @@ class PrinterService extends ChangeNotifier {
     required String name,
     required String month,
     required String paymentDate,
-    required String Function(double) formatPrice,
+    required String formatPrice,
     PaperSize paperSize = PaperSize.mm58,
   }) async {
     final profile = await CapabilityProfile.load();
@@ -401,10 +405,10 @@ class PrinterService extends ChangeNotifier {
     bytes += gen.hr(ch: '-');
     bytes += gen.text(paymentDate, styles: const PosStyles(align: PosAlign.center));
     bytes += gen.feed(3);
-    bytes += gen.text('Nama: $name');
-    bytes += gen.text('Bulan: $month');
-    bytes += gen.text('Total: $formatPrice');
-    bytes += gen.text('Nama: $name');
+    bytes += gen.text('Nama  : $name');
+    bytes += gen.text('Bulan : $month');
+    bytes += gen.text('Total : $formatPrice');
+    bytes += gen.text('Nama  : $name');
     bytes += gen.feed(3);
     bytes += gen.cut();
 

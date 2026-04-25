@@ -24,7 +24,7 @@ Future<void> printReceiptWithFeedback({
 required String name,
 required String month,
 required String paymentDate,
-required String Function(double) formatPrice,
+required String formatPrice,
   required VoidCallback navigateToSettings,
 }) async {
   final svc = context.read<PrinterService>(); 
