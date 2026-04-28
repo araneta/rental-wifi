@@ -158,7 +158,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
     }
   }
 
-  Future<void> submitForm() async {
+  Future<bool> submitForm({bool navigate = true}) async {
     final token = await getToken();
     setState(() => isSubmitting = true);
     try {
@@ -186,17 +186,22 @@ class _PembayaranPageState extends State<PembayaranPage> {
           context,
           MaterialPageRoute(builder: (_) => TagihanPage()),
         );
+        return true;
       } else {
         setState(() {
           alertMessage = 'Terjadi kesalahan saat menyimpan.';
           alertType = 'danger';
         });
+        return false;
+
       }
     } catch (e) {
       setState(() {
         alertMessage = 'Terjadi kesalahan saat menyimpan.';
         alertType = 'danger';
       });
+      return false;
+
     } finally {
       setState(() => isSubmitting = false);
     }
@@ -385,9 +390,12 @@ class _PembayaranPageState extends State<PembayaranPage> {
 						ElevatedButton(
 						  onPressed: isPrinting
 							  ? null
-							  : () {
+							  : () async {
 								  if (_formKey.currentState?.validate() ?? false) {
-									printForm();
+									final success = await submitForm(navigate: false);
+									if (success) {
+									  await printForm();
+									}
 								  }
 								},
 						  child: isPrinting

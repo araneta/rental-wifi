@@ -11,6 +11,8 @@ import 'package:provider/provider.dart';
 import './services/printer_service.dart';
 import 'widgets/app_drawer.dart';
 import 'utils/auth_utils.dart';
+import 'services/printer_service.dart';
+import 'print_helper.dart';
 
 class TagihanItem {
   final String id;
@@ -19,6 +21,7 @@ class TagihanItem {
   final String alamat;
   final int jumlah;
   final String status;
+  final String tanggalBayar;
 
   TagihanItem({
     required this.id,
@@ -27,6 +30,7 @@ class TagihanItem {
     required this.alamat,
     required this.jumlah,
     required this.status,
+    this.tanggalBayar = "",
   });
 
   factory TagihanItem.fromJson(Map<String, dynamic> json) {
@@ -35,12 +39,14 @@ class TagihanItem {
       pelanggan: json['pelanggan'] ?? '',
       bulanTahun: json['bulan_tahun'] ?? '',
       alamat: json['alamat'] ?? '',
-      jumlah: int.tryParse(json['jumlah']?.split('.')?.first ?? '0') ?? 0,
+      jumlah: int.tryParse(
+        (json['jumlah'] ?? '0').toString().split('.').first,
+      ) ?? 0,
       status: json['status'] ?? '',
+      tanggalBayar: json['tanggal_bayar'] ?? '',
     );
   }
 }
-
 class TagihanPage extends StatefulWidget {
   @override
   State<TagihanPage> createState() => _TagihanPageState();
@@ -52,7 +58,8 @@ class _TagihanPageState extends State<TagihanPage> {
   String selectedStatus = 'semua';
   bool isLoading = false;
   String filterBulanTahun = '';
-
+	String? printingId;
+	
   final List<String> statusOptions = ['semua', 'dibayar', 'belum bayar'];
 
   @override
@@ -76,6 +83,8 @@ class _TagihanPageState extends State<TagihanPage> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        print('response.body');
+        print(response.body);
         final List items = data['tagihans'] ?? [];
         setState(() {
           allItems = items.map((item) => TagihanItem.fromJson(item)).toList();
@@ -101,7 +110,69 @@ class _TagihanPageState extends State<TagihanPage> {
       return bulanTahunMatch && keywordMatch;
     }).toList();
   }
+	String formatMonthYear(String input) {
+		  final date = DateTime.parse("$input-01"); // add day to make it valid
+		  return DateFormat('MMMM yyyy', 'id_ID').format(date);
+	  }
+	  
+	  void _showSnack(String msg, {bool isError = false}) {
+		if (!mounted) return;
+		ScaffoldMessenger.of(context).showSnackBar(
+		  SnackBar(
+			content: Text(msg),
+			backgroundColor: isError ? const Color(0xFFFF3B30) : const Color(0xFF34C759),
+		  ),
+		);
+	  }
+	  
+	Future<void> printForm(TagihanItem item) async {		
+		setState(() => printingId = item.id);
 
+		print("item");
+		print("ID: ${item.id}");
+print("Pelanggan: ${item.pelanggan}");
+print("Bulan: ${item.bulanTahun}");
+print("Alamat: ${item.alamat}");
+print("Jumlah: ${item.jumlah}");
+print("Status: ${item.status}");
+print("Tanggal Bayar: ${item.tanggalBayar}");
+		
+		final bulanTahun = formatMonthYear(item.bulanTahun);
+		
+		print("tanggal_pembayaran "+item.tanggalBayar);
+		String formattedDate = '-';
+
+		final parsedDate = DateTime.tryParse(item.tanggalBayar);
+		if (parsedDate != null) {
+		  formattedDate = DateFormat('dd MMMM yyyy', 'id').format(parsedDate);
+		}
+
+		print("formattedDate $formattedDate");
+				
+		print("pelanggan_nama "+item.pelanggan);
+		print("bulan_tahun "+bulanTahun);
+		
+		
+		final jumlahText = 'Rp ${item.jumlah.toString().replaceAllMapped(RegExp(r'(\d{3})(?=\d)'), (m) => '${m[1]}.')}';
+		print("jumlah "+jumlahText);		
+		try {
+			
+			await printReceiptWithFeedback(
+				context: context,
+				name: item.pelanggan,
+				month: bulanTahun,				
+				paymentDate: formattedDate,
+				formatPrice:jumlahText,
+				navigateToSettings: () => Navigator.pushNamed(context, '/settings'),
+			  );
+		  } catch (e) {
+			_showSnack(e.toString(), isError: true);
+		  }finally{
+			 setState(() => printingId = null);
+ 
+		  }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Consumer<PrinterService>(builder: (_, printer, __) {
@@ -169,6 +240,8 @@ class _TagihanPageState extends State<TagihanPage> {
                             separatorBuilder: (_, __) => const Divider(),
                             itemBuilder: (context, index) {
                               final item = filteredItems[index];
+                              final isThisPrinting = printingId == item.id;
+
                               return ListTile(
                                 title: Text(item.pelanggan),
                                 subtitle: Column(
@@ -177,7 +250,7 @@ class _TagihanPageState extends State<TagihanPage> {
                                     Text(item.alamat),
                                     Text(item.bulanTahun),
                                     Text(
-                                      'Rp${item.jumlah.toString().replaceAllMapped(RegExp(r'(\d{3})(?=\d)'), (m) => '${m[1]}.')}',
+                                      'Rp ${item.jumlah.toString().replaceAllMapped(RegExp(r'(\d{3})(?=\d)'), (m) => '${m[1]}.')}',
                                     ),
                                     Text(
                                       item.status,
@@ -187,6 +260,7 @@ class _TagihanPageState extends State<TagihanPage> {
                                             : Colors.red,
                                       ),
                                     ),
+                                   
                                   ],
                                 ),
                                 trailing: item.status == 'belum bayar'
@@ -206,7 +280,20 @@ class _TagihanPageState extends State<TagihanPage> {
                                             style:
                                                 TextStyle(color: Colors.white)),
                                       )
-                                    : null,
+                                    :  ElevatedButton(
+									  onPressed: isThisPrinting
+										  ? null
+										  : () async {											  
+												await printForm(item);												
+											},
+									  child: isThisPrinting
+										  ? SizedBox(
+											  width: 16,
+											  height: 16,
+											  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+											)
+										  : Text('Print'),
+									),
                               );
                             },
                           ),
