@@ -385,8 +385,8 @@ class PrinterService extends ChangeNotifier {
     final profile = await CapabilityProfile.load();
     final gen     = Generator(paperSize, profile);
     List<int> bytes = [];
-
-    bytes += gen.setGlobalCodeTable('CP1252');
+	bytes += gen.reset();
+    bytes += gen.setGlobalCodeTable('CP1252');    
 
     // ── Store header (CENTER, large name) ─────────────────────────────────────
     bytes += gen.text(
@@ -410,7 +410,7 @@ class PrinterService extends ChangeNotifier {
     bytes += gen.text('Total : $formatPrice');
     bytes += gen.feed(1);
     bytes += gen.text("Terima Kasih", styles: const PosStyles(align: PosAlign.center));
-    bytes += gen.feed(2);
+    bytes += gen.feed(0);
     bytes += gen.cut();
 
     return bytes;

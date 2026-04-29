@@ -181,11 +181,13 @@ class _PembayaranPageState extends State<PembayaranPage> {
           alertMessage = 'Pembayaran berhasil ditambahkan!';
           alertType = 'success';
         });
-        _formKey.currentState?.reset();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => TagihanPage()),
-        );
+        if(navigate){
+			_formKey.currentState?.reset();
+			Navigator.pushReplacement(
+				context,
+				MaterialPageRoute(builder: (_) => TagihanPage()),
+			);
+		}
         return true;
       } else {
         setState(() {

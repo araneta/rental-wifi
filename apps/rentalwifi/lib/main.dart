@@ -33,6 +33,11 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: SplashPage(), // Initial page to decide where to go
+      routes: {
+        '/tagihan': (context) => TagihanPage(),
+        '/settings': (context) => SettingsScreen(),
+        '/login': (context) => LoginPage(),
+      },
     );
   }
 }
