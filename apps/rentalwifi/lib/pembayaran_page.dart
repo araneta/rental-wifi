@@ -268,6 +268,12 @@ class _PembayaranPageState extends State<PembayaranPage> {
 				formatPrice:jumlahText,
 				navigateToSettings: () => Navigator.pushNamed(context, '/settings'),
 			  );
+			_formKey.currentState?.reset();
+			Navigator.pushReplacement(
+				context,
+				MaterialPageRoute(builder: (_) => TagihanPage()),
+			);
+			  
 		  } catch (e) {
 			_showSnack(e.toString(), isError: true);
 		  }finally{
